@@ -1199,8 +1199,14 @@
                                     try { fullText += JSON.parse(data); }
                                     catch { fullText += data; }
                                 } else if (eventType === 'image') {
-                                    try { fullText += '\n\n![AI生成](' + JSON.parse(data) + ')'; }
-                                    catch {}
+                                    let imgUrl = '';
+                                    try { imgUrl = JSON.parse(data); }
+                                    catch { imgUrl = data; }
+                                    // If it's base64, ensure it has data URI prefix
+                                    if (imgUrl && !imgUrl.startsWith('data:') && !imgUrl.startsWith('http')) {
+                                        imgUrl = 'data:image/jpeg;base64,' + imgUrl;
+                                    }
+                                    if (imgUrl) fullText += '\n\n![AI生成](' + imgUrl + ')';
                                 } else if (eventType === 'done') {
                                     try {
                                         doFinish(JSON.parse(data));
