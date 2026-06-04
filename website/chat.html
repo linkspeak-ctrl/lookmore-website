@@ -813,40 +813,20 @@
             var html = [];
             var inCode = false;
             var codeLines = [];
+            var inMathBlock = false;
+            var mathLines = [];
             var buf = [];
 
             function inline(text) {
-                // LaTeX block math $$...$$
-                text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
-                    try {
-                        return '<div class="katex-block">' + katex.renderToString(formula, { displayMode: true, throwOnError: false }) + '</div>';
-                    } catch (e) {
-                        return '<pre>' + formula + '</pre>';
-                    }
-                });
-                // LaTeX block math \[...\]
-                text = text.replace(/\\\[([\s\S]+?)\\\]/g, function(match, formula) {
-                    try {
-                        return '<div class="katex-block">' + katex.renderToString(formula, { displayMode: true, throwOnError: false }) + '</div>';
-                    } catch (e) {
-                        return '<pre>' + formula + '</pre>';
-                    }
-                });
                 // LaTeX inline math $...$
                 text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
-                    try {
-                        return katex.renderToString(formula, { displayMode: false, throwOnError: false });
-                    } catch (e) {
-                        return '<code>' + formula + '</code>';
-                    }
+                    try { return katex.renderToString(formula, { displayMode: false, throwOnError: false }); }
+                    catch (e) { return '<code>' + formula + '</code>'; }
                 });
                 // LaTeX inline math \(...\)
                 text = text.replace(/\\\((.+?)\\\)/g, function(match, formula) {
-                    try {
-                        return katex.renderToString(formula, { displayMode: false, throwOnError: false });
-                    } catch (e) {
-                        return '<code>' + formula + '</code>';
-                    }
+                    try { return katex.renderToString(formula, { displayMode: false, throwOnError: false }); }
+                    catch (e) { return '<code>' + formula + '</code>'; }
                 });
                 text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                 text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
@@ -859,6 +839,18 @@
                 if (buf.length) {
                     buf.forEach(function(line) { html.push('<p>' + inline(line) + '</p>'); });
                     buf = [];
+                }
+            }
+
+            function flushMath() {
+                if (mathLines.length) {
+                    var formula = mathLines.join('\n').trim();
+                    if (formula) {
+                        try { html.push('<div class="katex-block">' + katex.renderToString(formula, { displayMode: true, throwOnError: false }) + '</div>'); }
+                        catch (e) { html.push('<pre>' + escapeHtml(formula) + '</pre>'); }
+                    }
+                    mathLines = [];
+                    inMathBlock = false;
                 }
             }
 
@@ -880,6 +872,33 @@
 
                 if (inCode) {
                     codeLines.push(line);
+                    continue;
+                }
+
+                // Block math $$...$$
+                if (line.trim() === '$$') {
+                    if (inMathBlock) {
+                        flushMath();
+                    } else {
+                        flushText();
+                        inMathBlock = true;
+                    }
+                    continue;
+                }
+
+                // Block math \[...\]
+                if (line.trim() === '\\[') {
+                    flushText();
+                    inMathBlock = true;
+                    continue;
+                }
+                if (line.trim() === '\\]') {
+                    if (inMathBlock) flushMath();
+                    continue;
+                }
+
+                if (inMathBlock) {
+                    mathLines.push(line);
                     continue;
                 }
 
@@ -936,6 +955,7 @@
             }
 
             flushText();
+            flushMath();
 
             // Flush remaining code block
             if (inCode && codeLines.length) {
