@@ -452,6 +452,161 @@
             color: var(--gray-400);
         }
 
+        /* ===== Stats Section ===== */
+        .stats {
+            padding: 80px 24px;
+            background: var(--gray-100);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 32px;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 20px;
+        }
+
+        .stat-number {
+            font-size: clamp(36px, 5vw, 56px);
+            font-weight: 700;
+            color: var(--purple-500);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 15px;
+            color: var(--gray-600);
+        }
+
+        /* ===== Testimonials Section ===== */
+        .testimonials {
+            padding: 100px 24px;
+            background: var(--white);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .testimonial-card {
+            background: var(--gray-50);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--gray-200);
+        }
+
+        .testimonial-text {
+            font-size: 17px;
+            color: var(--gray-800);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .testimonial-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--purple-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .testimonial-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .testimonial-role {
+            font-size: 13px;
+            color: var(--gray-400);
+        }
+
+        /* ===== Use Cases Section ===== */
+        .use-cases {
+            padding: 100px 24px;
+            background: var(--gray-100);
+        }
+
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .use-case-card {
+            background: var(--white);
+            border-radius: 16px;
+            padding: 32px;
+            border: 1px solid var(--gray-200);
+            transition: transform 0.2s ease;
+        }
+
+        .use-case-card:hover {
+            transform: translateY(-4px);
+        }
+
+        .use-case-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .use-case-title {
+            font-size: 19px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .use-case-desc {
+            font-size: 15px;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* ===== FAQ Section ===== */
+        .faq {
+            padding: 100px 24px;
+            background: var(--white);
+        }
+
+        .faq-list {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--gray-200);
+            padding: 24px 0;
+        }
+
+        .faq-question {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .faq-answer {
+            font-size: 15px;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
         /* ===== CTA Section ===== */
         .cta {
             padding: 100px 24px;
@@ -590,6 +745,35 @@
                 grid-template-columns: repeat(2, 1fr);
             }
 
+            .stats {
+                padding: 60px 16px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+
+            .testimonials {
+                padding: 60px 16px;
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .use-cases {
+                padding: 60px 16px;
+            }
+
+            .use-cases-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .faq {
+                padding: 60px 16px;
+            }
+
             .cta {
                 padding: 60px 16px;
             }
@@ -641,6 +825,39 @@
 
             .model-name {
                 font-size: 14px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+
+            .stat-number {
+                font-size: 32px;
+            }
+
+            .stat-label {
+                font-size: 13px;
+            }
+
+            .testimonial-card {
+                padding: 24px;
+            }
+
+            .testimonial-text {
+                font-size: 15px;
+            }
+
+            .use-case-card {
+                padding: 24px;
+            }
+
+            .use-case-icon {
+                font-size: 32px;
+            }
+
+            .use-case-title {
+                font-size: 17px;
             }
 
             .section-header {
@@ -845,6 +1062,154 @@
                     <div class="model-icon">✨</div>
                     <div class="model-name">更多模型</div>
                     <div class="model-provider">持续更新中</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="section-container">
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">AI 模型</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">50K+</div>
+                    <div class="stat-label">活跃用户</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">99.9%</div>
+                    <div class="stat-label">服务稳定性</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number">&lt;1s</div>
+                    <div class="stat-label">响应时间</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Use Cases Section -->
+    <section class="use-cases">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <p class="section-label">使用场景</p>
+                <h2>AI 能帮你做什么</h2>
+                <p class="section-subtitle">从日常问答到专业创作，AI 是你的全能助手</p>
+            </div>
+            <div class="use-cases-grid">
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">✍️</div>
+                    <div class="use-case-title">内容创作</div>
+                    <div class="use-case-desc">撰写文章、邮件、文案，让 AI 帮你高效产出优质内容</div>
+                </div>
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">💻</div>
+                    <div class="use-case-title">编程辅助</div>
+                    <div class="use-case-desc">代码生成、调试、优化，支持多种编程语言</div>
+                </div>
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">📚</div>
+                    <div class="use-case-title">学习辅导</div>
+                    <div class="use-case-desc">知识问答、概念解释、作业辅导，随时学习</div>
+                </div>
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">🎨</div>
+                    <div class="use-case-title">创意设计</div>
+                    <div class="use-case-desc">头脑风暴、方案策划、创意灵感，激发无限可能</div>
+                </div>
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">📊</div>
+                    <div class="use-case-title">数据分析</div>
+                    <div class="use-case-desc">数据解读、报告生成、趋势分析，让数据说话</div>
+                </div>
+                <div class="use-case-card reveal">
+                    <div class="use-case-icon">🌐</div>
+                    <div class="use-case-title">翻译润色</div>
+                    <div class="use-case-desc">多语言翻译、文本润色、语法修正，跨越语言障碍</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="testimonials">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <p class="section-label">用户评价</p>
+                <h2>他们都在用 LookMore</h2>
+                <p class="section-subtitle">来自真实用户的反馈</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"LookMore 帮我节省了大量写作时间，AI 的回答质量非常高，界面也很舒适。"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨‍💻</div>
+                        <div>
+                            <div class="testimonial-name">张明</div>
+                            <div class="testimonial-role">产品经理</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"作为程序员，LookMore 的代码生成功能太强了，大大提升了我的开发效率。"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👩‍💻</div>
+                        <div>
+                            <div class="testimonial-name">李华</div>
+                            <div class="testimonial-role">前端工程师</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"界面简洁优雅，响应速度快，是我用过的最好的 AI 助手。"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👨‍🎨</div>
+                        <div>
+                            <div class="testimonial-name">王强</div>
+                            <div class="testimonial-role">设计师</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"支持多种模型切换，可以根据不同任务选择最合适的 AI，非常灵活。"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">👩‍🏫</div>
+                        <div>
+                            <div class="testimonial-name">赵丽</div>
+                            <div class="testimonial-role">内容创作者</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <p class="section-label">常见问题</p>
+                <h2>你可能想知道</h2>
+            </div>
+            <div class="faq-list">
+                <div class="faq-item reveal">
+                    <div class="faq-question">LookMore 是免费的吗？</div>
+                    <div class="faq-answer">LookMore 提供免费使用额度，满足日常需求。如需更高使用量，可选择付费套餐。</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-question">支持哪些 AI 模型？</div>
+                    <div class="faq-answer">我们集成了 GPT-4o、Claude 3.5、Gemini Pro、Llama 3、DeepSeek 等 10+ 主流模型，持续更新中。</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-question">我的数据安全吗？</div>
+                    <div class="faq-answer">完全安全。我们支持本地存储，你的对话数据不会上传到服务器，隐私由你掌控。</div>
+                </div>
+                <div class="faq-item reveal">
+                    <div class="faq-question">可以在手机上使用吗？</div>
+                    <div class="faq-answer">当然可以！LookMore 支持微信小程序和网页端，手机、平板、电脑都能流畅使用。</div>
                 </div>
             </div>
         </div>
