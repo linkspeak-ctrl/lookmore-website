@@ -44,9 +44,27 @@
             flex-direction: column;
             height: 100vh;
             height: 100dvh;
-            max-width: 800px;
-            margin: 0 auto;
             background: var(--white);
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 768px) {
+            .chat-container {
+                max-width: 100%;
+            }
+
+            .messages-container {
+                max-width: 768px;
+                margin: 0 auto;
+                width: 100%;
+            }
+
+            .input-area {
+                max-width: 768px;
+                margin: 0 auto;
+                width: 100%;
+            }
         }
 
         /* ===== Header ===== */
@@ -60,6 +78,14 @@
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--gray-200);
             min-height: 56px;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .chat-header {
+                max-width: 100%;
+                padding: 12px 20px;
+            }
         }
 
         .header-left {
@@ -127,6 +153,14 @@
             overflow-y: auto;
             padding: 20px 16px;
             scroll-behavior: smooth;
+        }
+
+        @media (min-width: 768px) {
+            .messages-container {
+                max-width: 768px;
+                margin: 0 auto;
+                padding: 24px 20px;
+            }
         }
 
         .message {
@@ -256,6 +290,15 @@
             padding-bottom: max(12px, env(safe-area-inset-bottom));
             background: var(--white);
             border-top: 1px solid var(--gray-200);
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .input-area {
+                max-width: 768px;
+                margin: 0 auto;
+                padding: 16px 20px;
+            }
         }
 
         .input-wrapper {
@@ -264,7 +307,7 @@
             gap: 8px;
             background: var(--gray-100);
             border-radius: 24px;
-            padding: 8px;
+            padding: 8px 8px 8px 16px;
         }
 
         .upload-btn {
@@ -466,7 +509,15 @@
             justify-content: center;
             height: 100%;
             text-align: center;
-            padding: 40px;
+            padding: 40px 20px;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-screen {
+                max-width: 768px;
+                margin: 0 auto;
+                width: 100%;
+            }
         }
 
         .welcome-icon {
@@ -487,10 +538,10 @@
         }
 
         .welcome-title {
-            font-size: 24px;
+            font-size: clamp(22px, 5vw, 32px);
             font-weight: 700;
             color: var(--gray-900);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .welcome-subtitle {
@@ -524,9 +575,9 @@
         .welcome-suggestions {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
-            max-width: 400px;
+            max-width: 480px;
         }
 
         .suggestion-btn {
