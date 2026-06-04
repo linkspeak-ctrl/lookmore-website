@@ -778,6 +778,7 @@
 
         // ===== API Communication =====
         async function sendToAPI(message) {
+            assistantMsgEl = null;
             let fullText = '';
             let lastUpdateTime = 0;
             let buffer = '';
@@ -868,22 +869,30 @@
                 updateAssistantMessage('抱歉，请求失败：' + error.message);
             } finally {
                 isLoading = false;
-                // Remove typing indicator
+                // Clean up typing indicator if still there
                 const typingEl = document.getElementById('typingIndicator');
                 if (typingEl) typingEl.remove();
                 scrollToBottom();
             }
         }
 
+        let assistantMsgEl = null;
+
         function updateAssistantMessage(content) {
-            // Find or create assistant message element
-            let assistantMsg = messagesContainer.querySelector('.message.assistant:last-child .message-bubble');
-            if (!assistantMsg) {
+            // Remove typing indicator on first token
+            const typingEl = document.getElementById('typingIndicator');
+            if (typingEl) {
+                typingEl.remove();
+            }
+
+            // Create assistant message element if not exists
+            if (!assistantMsgEl) {
                 const msg = createMessageElement('assistant', content);
                 messagesContainer.appendChild(msg);
-                assistantMsg = msg.querySelector('.message-bubble');
+                assistantMsgEl = msg.querySelector('.message-bubble');
+            } else {
+                assistantMsgEl.textContent = content;
             }
-            assistantMsg.textContent = content;
             scrollToBottom();
         }
 
