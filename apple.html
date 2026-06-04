@@ -482,60 +482,6 @@
             color: var(--gray-600);
         }
 
-        /* ===== Testimonials Section ===== */
-        .testimonials {
-            padding: 100px 24px;
-            background: var(--white);
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
-        }
-
-        .testimonial-card {
-            background: var(--gray-50);
-            border-radius: 16px;
-            padding: 32px;
-            border: 1px solid var(--gray-200);
-        }
-
-        .testimonial-text {
-            font-size: 17px;
-            color: var(--gray-800);
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .testimonial-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--purple-100);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-
-        .testimonial-name {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .testimonial-role {
-            font-size: 13px;
-            color: var(--gray-400);
-        }
-
         /* ===== Use Cases Section ===== */
         .use-cases {
             padding: 100px 24px;
@@ -639,9 +585,9 @@
         /* ===== Animations ===== */
         .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transform: translateY(30px);
+            transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
         .reveal.visible {
@@ -651,9 +597,9 @@
 
         .reveal-left {
             opacity: 0;
-            transform: translateX(-30px);
-            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transform: translateX(-40px);
+            transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
         .reveal-left.visible {
@@ -663,15 +609,46 @@
 
         .reveal-right {
             opacity: 0;
-            transform: translateX(30px);
-            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
-                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+            transform: translateX(40px);
+            transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
 
         .reveal-right.visible {
             opacity: 1;
             transform: translateX(0);
         }
+
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.9);
+            transition: opacity 0.6s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.6s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal-scale.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .reveal-rotate {
+            opacity: 0;
+            transform: rotate(-5deg) scale(0.95);
+            transition: opacity 0.7s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.7s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal-rotate.visible {
+            opacity: 1;
+            transform: rotate(0) scale(1);
+        }
+
+        /* Stagger animation delays */
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
 
         /* Typewriter Animation - Looping */
         .hero h1 .char {
@@ -701,6 +678,15 @@
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
+        }
+
+        /* Pulse animation for stats */
+        .stat-number {
+            transition: transform 0.3s ease;
+        }
+
+        .stat-item:hover .stat-number {
+            transform: scale(1.05);
         }
 
         /* ===== Responsive: 640px ===== */
@@ -752,14 +738,6 @@
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
                 gap: 24px;
-            }
-
-            .testimonials {
-                padding: 60px 16px;
-            }
-
-            .testimonials-grid {
-                grid-template-columns: 1fr;
             }
 
             .use-cases {
@@ -838,14 +816,6 @@
 
             .stat-label {
                 font-size: 13px;
-            }
-
-            .testimonial-card {
-                padding: 24px;
-            }
-
-            .testimonial-text {
-                font-size: 15px;
             }
 
             .use-case-card {
@@ -973,7 +943,7 @@
                 <div class="feature-visual reveal-left">
                     <div class="feature-image-placeholder">⚡</div>
                 </div>
-                <div class="feature-text reveal-right">
+                <div class="feature-text reveal-right delay-1">
                     <p class="feature-label">极速响应</p>
                     <h3>流式输出，实时可见</h3>
                     <p>AI 的思考过程实时呈现，无需漫长等待。每一次对话都是即时的、自然的。</p>
@@ -987,7 +957,7 @@
                 <div class="feature-visual reveal-right">
                     <div class="feature-image-placeholder">🧠</div>
                 </div>
-                <div class="feature-text reveal-left">
+                <div class="feature-text reveal-left delay-1">
                     <p class="feature-label">多模型支持</p>
                     <h3>选择最适合的 AI</h3>
                     <p>集成 GPT-4o、Claude、Gemini 等主流模型，按需选择，灵活切换。</p>
@@ -1001,7 +971,7 @@
                 <div class="feature-visual reveal-left">
                     <div class="feature-image-placeholder">🔒</div>
                 </div>
-                <div class="feature-text reveal-right">
+                <div class="feature-text reveal-right delay-1">
                     <p class="feature-label">隐私保护</p>
                     <h3>你的数据，你做主</h3>
                     <p>支持本地存储，对话数据不离开你的设备。安全、私密、可控。</p>
@@ -1015,7 +985,7 @@
                 <div class="feature-visual reveal-right">
                     <div class="feature-image-placeholder">📱</div>
                 </div>
-                <div class="feature-text reveal-left">
+                <div class="feature-text reveal-left delay-1">
                     <p class="feature-label">跨平台</p>
                     <h3>随时随地，想用就用</h3>
                     <p>支持微信小程序和网页端，手机、平板、电脑无缝切换。</p>
@@ -1033,32 +1003,32 @@
                 <p class="section-subtitle">根据你的需求选择最合适的 AI</p>
             </div>
             <div class="models-grid">
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-1">
                     <div class="model-icon">🤖</div>
                     <div class="model-name">GPT-4o</div>
                     <div class="model-provider">OpenAI</div>
                 </div>
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-2">
                     <div class="model-icon">🧠</div>
                     <div class="model-name">Claude 3.5</div>
                     <div class="model-provider">Anthropic</div>
                 </div>
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-3">
                     <div class="model-icon">💎</div>
                     <div class="model-name">Gemini Pro</div>
                     <div class="model-provider">Google</div>
                 </div>
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-1">
                     <div class="model-icon">🌀</div>
                     <div class="model-name">Llama 3</div>
                     <div class="model-provider">Meta</div>
                 </div>
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-2">
                     <div class="model-icon">🎯</div>
                     <div class="model-name">DeepSeek</div>
                     <div class="model-provider">深度求索</div>
                 </div>
-                <div class="model-card reveal">
+                <div class="model-card reveal-scale delay-3">
                     <div class="model-icon">✨</div>
                     <div class="model-name">更多模型</div>
                     <div class="model-provider">持续更新中</div>
@@ -1071,19 +1041,19 @@
     <section class="stats">
         <div class="section-container">
             <div class="stats-grid">
-                <div class="stat-item reveal">
+                <div class="stat-item reveal-scale delay-1">
                     <div class="stat-number">10+</div>
                     <div class="stat-label">AI 模型</div>
                 </div>
-                <div class="stat-item reveal">
+                <div class="stat-item reveal-scale delay-2">
                     <div class="stat-number">50K+</div>
                     <div class="stat-label">活跃用户</div>
                 </div>
-                <div class="stat-item reveal">
+                <div class="stat-item reveal-scale delay-3">
                     <div class="stat-number">99.9%</div>
                     <div class="stat-label">服务稳定性</div>
                 </div>
-                <div class="stat-item reveal">
+                <div class="stat-item reveal-scale delay-4">
                     <div class="stat-number">&lt;1s</div>
                     <div class="stat-label">响应时间</div>
                 </div>
@@ -1100,88 +1070,35 @@
                 <p class="section-subtitle">从日常问答到专业创作，AI 是你的全能助手</p>
             </div>
             <div class="use-cases-grid">
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-1">
                     <div class="use-case-icon">✍️</div>
                     <div class="use-case-title">内容创作</div>
                     <div class="use-case-desc">撰写文章、邮件、文案，让 AI 帮你高效产出优质内容</div>
                 </div>
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-2">
                     <div class="use-case-icon">💻</div>
                     <div class="use-case-title">编程辅助</div>
                     <div class="use-case-desc">代码生成、调试、优化，支持多种编程语言</div>
                 </div>
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-3">
                     <div class="use-case-icon">📚</div>
                     <div class="use-case-title">学习辅导</div>
                     <div class="use-case-desc">知识问答、概念解释、作业辅导，随时学习</div>
                 </div>
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-1">
                     <div class="use-case-icon">🎨</div>
                     <div class="use-case-title">创意设计</div>
                     <div class="use-case-desc">头脑风暴、方案策划、创意灵感，激发无限可能</div>
                 </div>
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-2">
                     <div class="use-case-icon">📊</div>
                     <div class="use-case-title">数据分析</div>
                     <div class="use-case-desc">数据解读、报告生成、趋势分析，让数据说话</div>
                 </div>
-                <div class="use-case-card reveal">
+                <div class="use-case-card reveal-rotate delay-3">
                     <div class="use-case-icon">🌐</div>
                     <div class="use-case-title">翻译润色</div>
                     <div class="use-case-desc">多语言翻译、文本润色、语法修正，跨越语言障碍</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials">
-        <div class="section-container">
-            <div class="section-header reveal">
-                <p class="section-label">用户评价</p>
-                <h2>他们都在用 LookMore</h2>
-                <p class="section-subtitle">来自真实用户的反馈</p>
-            </div>
-            <div class="testimonials-grid">
-                <div class="testimonial-card reveal">
-                    <p class="testimonial-text">"LookMore 帮我节省了大量写作时间，AI 的回答质量非常高，界面也很舒适。"</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">👨‍💻</div>
-                        <div>
-                            <div class="testimonial-name">张明</div>
-                            <div class="testimonial-role">产品经理</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card reveal">
-                    <p class="testimonial-text">"作为程序员，LookMore 的代码生成功能太强了，大大提升了我的开发效率。"</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">👩‍💻</div>
-                        <div>
-                            <div class="testimonial-name">李华</div>
-                            <div class="testimonial-role">前端工程师</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card reveal">
-                    <p class="testimonial-text">"界面简洁优雅，响应速度快，是我用过的最好的 AI 助手。"</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">👨‍🎨</div>
-                        <div>
-                            <div class="testimonial-name">王强</div>
-                            <div class="testimonial-role">设计师</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="testimonial-card reveal">
-                    <p class="testimonial-text">"支持多种模型切换，可以根据不同任务选择最合适的 AI，非常灵活。"</p>
-                    <div class="testimonial-author">
-                        <div class="testimonial-avatar">👩‍🏫</div>
-                        <div>
-                            <div class="testimonial-name">赵丽</div>
-                            <div class="testimonial-role">内容创作者</div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1195,19 +1112,19 @@
                 <h2>你可能想知道</h2>
             </div>
             <div class="faq-list">
-                <div class="faq-item reveal">
+                <div class="faq-item reveal-left delay-1">
                     <div class="faq-question">LookMore 是免费的吗？</div>
                     <div class="faq-answer">LookMore 提供免费使用额度，满足日常需求。如需更高使用量，可选择付费套餐。</div>
                 </div>
-                <div class="faq-item reveal">
+                <div class="faq-item reveal-left delay-2">
                     <div class="faq-question">支持哪些 AI 模型？</div>
                     <div class="faq-answer">我们集成了 GPT-4o、Claude 3.5、Gemini Pro、Llama 3、DeepSeek 等 10+ 主流模型，持续更新中。</div>
                 </div>
-                <div class="faq-item reveal">
+                <div class="faq-item reveal-left delay-3">
                     <div class="faq-question">我的数据安全吗？</div>
                     <div class="faq-answer">完全安全。我们支持本地存储，你的对话数据不会上传到服务器，隐私由你掌控。</div>
                 </div>
-                <div class="faq-item reveal">
+                <div class="faq-item reveal-left delay-4">
                     <div class="faq-question">可以在手机上使用吗？</div>
                     <div class="faq-answer">当然可以！LookMore 支持微信小程序和网页端，手机、平板、电脑都能流畅使用。</div>
                 </div>
@@ -1265,8 +1182,8 @@
 
         // Intersection Observer for scroll animations
         const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -40px 0px'
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -1278,7 +1195,7 @@
             });
         }, observerOptions);
 
-        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate').forEach(el => {
             observer.observe(el);
         });
 
