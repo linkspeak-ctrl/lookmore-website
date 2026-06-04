@@ -1053,12 +1053,18 @@
 
                 const reader = response.body.getReader();
                 const decoder = new TextDecoder();
+                let streamDone = false;
 
-                while (true) {
+                while (!streamDone) {
                     const { done, value } = await reader.read();
-                    if (done) break;
+                    streamDone = done;
 
-                    buffer += decoder.decode(value, { stream: true });
+                    if (value) {
+                        buffer += decoder.decode(value, { stream: !done });
+                    } else if (done) {
+                        // Flush decoder
+                        buffer += decoder.decode();
+                    }
 
                     // Process SSE events
                     var idx = 0;
@@ -1070,7 +1076,6 @@
                         idx = sep + 2;
 
                         if (event.trim()) {
-                            // Parse event
                             const lines = event.split('\n');
                             let eventType = '';
                             for (const line of lines) {
@@ -1085,7 +1090,6 @@
                                         } catch {
                                             fullText += data;
                                         }
-                                        // Update UI with throttle
                                         const now = Date.now();
                                         if (now - lastUpdateTime > 30) {
                                             lastUpdateTime = now;
@@ -1103,11 +1107,10 @@
                             }
                         }
                     }
-                    // Keep only unprocessed data
                     buffer = buffer.slice(idx);
                 }
 
-                // Final update
+                // Final UI update
                 if (fullText) {
                     updateAssistantMessage(fullText);
                     messages.push({ role: 'assistant', content: fullText });
@@ -1118,7 +1121,6 @@
                 updateAssistantMessage('抱歉，请求失败：' + error.message);
             } finally {
                 isLoading = false;
-                // Clean up typing indicator if still there
                 const typingEl = document.getElementById('typingIndicator');
                 if (typingEl) typingEl.remove();
                 scrollToBottom();
