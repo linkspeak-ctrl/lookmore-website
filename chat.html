@@ -53,18 +53,6 @@
             .chat-container {
                 max-width: 100%;
             }
-
-            .messages-container {
-                max-width: 768px;
-                margin: 0 auto;
-                width: 100%;
-            }
-
-            .input-area {
-                max-width: 768px;
-                margin: 0 auto;
-                width: 100%;
-            }
         }
 
         /* ===== Header ===== */
@@ -153,6 +141,12 @@
             max-width: 768px;
             margin: 0 auto;
             padding: 20px 16px;
+        }
+
+        @media (min-width: 768px) {
+            .message-list {
+                padding: 24px 20px;
+            }
         }
 
         .message {
