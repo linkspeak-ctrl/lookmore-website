@@ -990,6 +990,313 @@
             .glow-ring { display: none; }
         }
 
+        /* ===== Mobile Optimization ===== */
+        @media (max-width: 768px) {
+            /* Hero Section */
+            .hero {
+                padding: 100px 16px 60px;
+                min-height: auto;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+                line-height: 1.2;
+                margin-bottom: 20px;
+            }
+
+            .hero p {
+                font-size: 16px;
+                margin-bottom: 32px;
+                padding: 0 8px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+                padding: 0 16px;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+                padding: 14px 24px;
+                font-size: 16px;
+            }
+
+            /* Mockup */
+            .hero-mockup-wrapper {
+                margin-top: 48px;
+                perspective: none;
+            }
+
+            .hero-mockup {
+                border-radius: 16px;
+                transform: none;
+                margin: 0 8px;
+            }
+
+            .hero-mockup:hover {
+                transform: translateY(-4px);
+            }
+
+            .mockup-header {
+                padding: 12px 16px;
+            }
+
+            .mockup-dots span {
+                width: 12px;
+                height: 12px;
+            }
+
+            .mockup-url {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .mockup-body {
+                padding: 32px 20px;
+                min-height: 280px;
+            }
+
+            .mockup-avatar {
+                width: 80px;
+                height: 80px;
+                border-radius: 20px;
+                font-size: 36px;
+                margin-bottom: 16px;
+            }
+
+            .mockup-title {
+                font-size: 18px;
+            }
+
+            .mockup-subtitle {
+                font-size: 14px;
+            }
+
+            .mockup-chat {
+                flex-direction: column;
+                align-items: center;
+                padding: 0 16px;
+                gap: 12px;
+            }
+
+            .chat-bubble {
+                max-width: 85%;
+                font-size: 13px;
+                padding: 12px 14px;
+            }
+
+            .chat-user {
+                align-self: flex-end;
+                border-radius: 16px 16px 4px 16px;
+            }
+
+            .chat-ai {
+                align-self: flex-start;
+                border-radius: 16px 16px 16px 4px;
+            }
+
+            /* Floating Orbs - Mobile */
+            .floating-orb {
+                opacity: 0.3;
+                filter: blur(40px);
+            }
+
+            .orb-1 {
+                width: 200px;
+                height: 200px;
+            }
+
+            .orb-2 {
+                width: 150px;
+                height: 150px;
+            }
+
+            .orb-3 {
+                width: 120px;
+                height: 120px;
+            }
+
+            /* Features Section */
+            .features {
+                padding: 80px 16px;
+            }
+
+            .section-header {
+                margin-bottom: 48px;
+            }
+
+            .section-title {
+                font-size: 28px;
+            }
+
+            .section-desc {
+                font-size: 16px;
+            }
+
+            .feature-card {
+                padding: 24px;
+            }
+
+            .feature-icon {
+                width: 56px;
+                height: 56px;
+                font-size: 28px;
+                margin-bottom: 16px;
+            }
+
+            .feature-title {
+                font-size: 18px;
+            }
+
+            .feature-desc {
+                font-size: 14px;
+            }
+
+            /* Models Section */
+            .models {
+                padding: 80px 16px;
+            }
+
+            .models-showcase {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+
+            .model-card {
+                padding: 20px 16px;
+            }
+
+            .model-icon {
+                font-size: 32px;
+                margin-bottom: 12px;
+            }
+
+            .model-name {
+                font-size: 14px;
+            }
+
+            .model-provider {
+                font-size: 12px;
+            }
+
+            /* CTA Section */
+            .cta {
+                padding: 80px 16px;
+            }
+
+            .cta-title {
+                font-size: 28px;
+            }
+
+            .cta-desc {
+                font-size: 16px;
+            }
+
+            .cta-btn {
+                padding: 14px 32px;
+                font-size: 16px;
+            }
+
+            /* Footer */
+            .footer {
+                padding: 48px 16px 24px;
+            }
+
+            .footer-grid {
+                gap: 32px;
+            }
+
+            .footer-brand p {
+                font-size: 14px;
+            }
+
+            .footer-title {
+                font-size: 13px;
+                margin-bottom: 16px;
+            }
+
+            .footer-links a {
+                font-size: 14px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .footer-copyright {
+                font-size: 12px;
+            }
+
+            /* Cursor Glow - Hide on Mobile */
+            .cursor-glow {
+                display: none;
+            }
+
+            /* Grid Pattern - Hide on Mobile */
+            .hero-grid {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero-badge {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+
+            .hero-badge-dot {
+                width: 6px;
+                height: 6px;
+            }
+
+            .mockup-body {
+                padding: 24px 16px;
+                min-height: 240px;
+            }
+
+            .mockup-avatar {
+                width: 64px;
+                height: 64px;
+                border-radius: 16px;
+                font-size: 28px;
+            }
+
+            .mockup-title {
+                font-size: 16px;
+            }
+
+            .chat-bubble {
+                max-width: 90%;
+                font-size: 12px;
+            }
+
+            .models-showcase {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+
+            .model-card {
+                padding: 16px 12px;
+            }
+
+            .model-icon {
+                font-size: 28px;
+                margin-bottom: 8px;
+            }
+
+            .model-name {
+                font-size: 13px;
+            }
+        }
+
         /* ===== Animations ===== */
         .fade-in {
             opacity: 0;
