@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>LookMore - AI 对话</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
     <style>
         /* ===== Reset & Variables ===== */
         * {
@@ -285,6 +287,18 @@
             margin: 8px 0;
             display: block;
             cursor: pointer;
+        }
+
+        .katex-block {
+            overflow-x: auto;
+            margin: 8px 0;
+            padding: 8px;
+            background: var(--gray-50);
+            border-radius: 8px;
+        }
+
+        .katex {
+            font-size: 1.1em;
         }
 
         .message-bubble p {
@@ -802,6 +816,22 @@
             var buf = [];
 
             function inline(text) {
+                // LaTeX block math $$...$$
+                text = text.replace(/\$\$([\s\S]+?)\$\$/g, function(match, formula) {
+                    try {
+                        return '<div class="katex-block">' + katex.renderToString(formula, { displayMode: true, throwOnError: false }) + '</div>';
+                    } catch (e) {
+                        return '<pre>' + formula + '</pre>';
+                    }
+                });
+                // LaTeX inline math $...$
+                text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
+                    try {
+                        return katex.renderToString(formula, { displayMode: false, throwOnError: false });
+                    } catch (e) {
+                        return '<code>' + formula + '</code>';
+                    }
+                });
                 text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                 text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
                 text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
