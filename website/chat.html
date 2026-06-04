@@ -986,7 +986,12 @@
         }
 
         function scrollToBottom() {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            // Only auto-scroll if user is near the bottom (within 150px)
+            var threshold = 150;
+            var isNearBottom = messagesContainer.scrollHeight - messagesContainer.scrollTop - messagesContainer.clientHeight < threshold;
+            if (isNearBottom) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
         }
 
         // ===== File Handling =====
