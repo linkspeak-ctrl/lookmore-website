@@ -993,8 +993,18 @@
             var files = event.target.files;
             if (!files || !files.length) return;
 
-            for (var i = 0; i < files.length; i++) {
+            var maxFiles = 10;
+            var remaining = maxFiles - pendingFiles.length;
+            if (remaining <= 0) {
+                alert('最多只能上传 ' + maxFiles + ' 个附件');
+                event.target.value = '';
+                return;
+            }
+
+            var added = 0;
+            for (var i = 0; i < Math.min(files.length, remaining); i++) {
                 var f = files[i];
+                added++;
                 // For images, just add them directly
                 if (f.type.startsWith('image/')) {
                     var reader = new FileReader();
@@ -1019,6 +1029,9 @@
                     });
                     renderFilePreview();
                 }
+            }
+            if (files.length > added) {
+                alert('已添加 ' + added + ' 个文件，最多 ' + maxFiles + ' 个附件');
             }
             event.target.value = '';
         }
