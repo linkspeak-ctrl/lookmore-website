@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LookMore - AI智能助手</title>
+    <style>
+        /* ===== Reset & Variables ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --white: #ffffff;
+            --gray-50: #fafafa;
+            --gray-100: #f5f5f7;
+            --gray-200: #e8e8ed;
+            --gray-400: #86868b;
+            --gray-600: #6e6e73;
+            --gray-800: #1d1d1f;
+            --gray-900: #111111;
+            --purple-100: #ede9fe;
+            --purple-500: #7c3aed;
+            --purple-600: #6d28d9;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif;
+            background: var(--white);
+            color: var(--gray-800);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        /* ===== Base Typography ===== */
+        h1 {
+            font-size: clamp(40px, 8vw, 96px);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+            color: var(--gray-900);
+        }
+
+        h2 {
+            font-size: clamp(32px, 5vw, 64px);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.025em;
+            color: var(--gray-900);
+        }
+
+        h3 {
+            font-size: clamp(20px, 3vw, 28px);
+            font-weight: 600;
+            line-height: 1.2;
+            color: var(--gray-900);
+        }
+
+        p {
+            font-size: clamp(16px, 2vw, 19px);
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* ===== Layout Utilities ===== */
+        .section-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Navigation ===== */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            box-shadow: 0 1px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        .nav-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 24px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--gray-600);
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--gray-900);
+        }
+
+        .nav-cta {
+            background: var(--purple-500);
+            color: var(--white) !important;
+            padding: 8px 20px;
+            border-radius: 980px;
+            font-weight: 600;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .nav-cta:hover {
+            background: var(--purple-600);
+            transform: scale(1.02);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            width: 44px;
+            height: 44px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--gray-900);
+        }
+
+        /* Mobile Menu Overlay */
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 99;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 32px;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            text-decoration: none;
+            color: var(--gray-900);
+            font-size: 28px;
+            font-weight: 600;
+            padding: 12px 24px;
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-menu-close {
+            position: absolute;
+            top: 16px;
+            right: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mobile-menu-close svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--gray-900);
+        }
+
+        /* ===== Hero Section ===== */
+        .hero {
+            min-height: 100svh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 120px 24px 80px;
+            background: var(--white);
+        }
+
+        .hero-content {
+            max-width: 800px;
+        }
+
+        .hero-label {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--purple-500);
+            margin-bottom: 16px;
+        }
+
+        .hero h1 {
+            margin-bottom: 24px;
+        }
+
+        .hero-subtitle {
+            max-width: 540px;
+            margin: 0 auto 40px;
+            color: var(--gray-400);
+            font-size: clamp(16px, 2vw, 19px);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* ===== Buttons ===== */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--purple-500);
+            color: var(--white);
+            padding: 16px 32px;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 600;
+            text-decoration: none;
+            min-height: 56px;
+            transition: transform 0.2s ease, background 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary:hover {
+            background: var(--purple-600);
+            transform: scale(1.02);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--purple-100);
+            color: var(--purple-500);
+            padding: 16px 32px;
+            border-radius: 980px;
+            font-size: 17px;
+            font-weight: 600;
+            text-decoration: none;
+            min-height: 56px;
+            transition: transform 0.2s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-secondary:hover {
+            transform: scale(1.02);
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-large {
+            padding: 20px 48px;
+            font-size: 19px;
+            min-height: 64px;
+        }
+
+        /* ===== Feature Rows ===== */
+        .feature-row {
+            padding: 120px 24px;
+            background: var(--white);
+        }
+
+        .feature-row:nth-child(even) {
+            background: var(--gray-100);
+        }
+
+        .feature-row-inner {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 64px;
+            align-items: center;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+
+        .feature-row:nth-child(even) .feature-row-inner {
+            direction: rtl;
+        }
+
+        .feature-row:nth-child(even) .feature-row-inner > * {
+            direction: ltr;
+        }
+
+        .feature-visual {
+            position: relative;
+        }
+
+        .feature-image-placeholder {
+            width: 100%;
+            aspect-ratio: 4/3;
+            background: var(--gray-100);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            transition: transform 0.1s ease-out;
+        }
+
+        .feature-row:nth-child(even) .feature-image-placeholder {
+            background: var(--white);
+        }
+
+        .feature-text {
+            padding: 20px 0;
+        }
+
+        .feature-label {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--purple-500);
+            margin-bottom: 12px;
+        }
+
+        .feature-text h3 {
+            margin-bottom: 16px;
+        }
+
+        .feature-text p {
+            max-width: 420px;
+        }
+
+        /* ===== Model Grid ===== */
+        .models {
+            padding: 160px 24px;
+            background: var(--white);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 64px;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--purple-500);
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .section-header h2 {
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            color: var(--gray-400);
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .model-card {
+            background: var(--white);
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            cursor: default;
+        }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(124, 58, 237, 0.2);
+        }
+
+        .model-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+        }
+
+        .model-name {
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .model-provider {
+            font-size: 14px;
+            color: var(--gray-400);
+        }
+
+        /* ===== CTA Section ===== */
+        .cta {
+            padding: 160px 24px;
+            text-align: center;
+            background: var(--white);
+        }
+
+        .cta h2 {
+            margin-bottom: 16px;
+        }
+
+        .cta p {
+            color: var(--gray-400);
+            margin-bottom: 40px;
+            font-size: clamp(16px, 2vw, 19px);
+        }
+
+        /* ===== Footer ===== */
+        .footer {
+            border-top: 1px solid var(--gray-200);
+            padding: 40px 24px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 14px;
+            color: var(--gray-400);
+        }
+
+        /* ===== Animations ===== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal-left.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .reveal-right {
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.8s cubic-bezier(0.25, 0.1, 0.25, 1),
+                        transform 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .reveal-right.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ===== Responsive: 640px ===== */
+        @media (min-width: 640px) {
+            .hero-buttons {
+                flex-wrap: nowrap;
+            }
+        }
+
+        /* ===== Responsive: 768px ===== */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+            }
+
+            .feature-row {
+                padding: 80px 16px;
+            }
+
+            .feature-row-inner {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .feature-row:nth-child(even) .feature-row-inner {
+                direction: ltr;
+            }
+
+            .feature-image-placeholder {
+                aspect-ratio: 16/9;
+            }
+
+            .models {
+                padding: 80px 16px;
+            }
+
+            .models-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .cta {
+                padding: 80px 16px;
+            }
+
+            .section-container {
+                padding: 0 16px;
+            }
+        }
+
+        /* ===== Responsive: 480px ===== */
+        @media (max-width: 480px) {
+            .hero {
+                padding: 100px 16px 60px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn-primary,
+            .btn-secondary {
+                width: 100%;
+            }
+
+            .feature-row {
+                padding: 64px 16px;
+            }
+
+            .feature-row-inner {
+                gap: 32px;
+            }
+
+            .feature-text h3 {
+                font-size: 22px;
+            }
+
+            .models-grid {
+                gap: 12px;
+            }
+
+            .model-card {
+                padding: 24px 16px;
+            }
+
+            .model-icon {
+                font-size: 32px;
+            }
+
+            .model-name {
+                font-size: 15px;
+            }
+
+            .section-header {
+                margin-bottom: 40px;
+            }
+
+            .btn-large {
+                width: 100%;
+            }
+        }
+
+        /* ===== Responsive: 1024px ===== */
+        @media (min-width: 1024px) {
+            .nav-container {
+                padding: 0 40px;
+            }
+
+            .section-container {
+                padding: 0 40px;
+            }
+        }
+
+        /* ===== Responsive: 1280px ===== */
+        @media (min-width: 1280px) {
+            .feature-row {
+                padding: 200px 24px;
+            }
+
+            .models {
+                padding: 200px 24px;
+            }
+
+            .cta {
+                padding: 200px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="28" height="28" rx="6" fill="#7c3aed"/>
+                    <path d="M8 14L12 18L20 10" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                LookMore
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features">功能</a></li>
+                <li><a href="#models">模型</a></li>
+                <li><a href="https://lookmore.cyou" class="nav-cta">开始使用</a></li>
+            </ul>
+            <button class="mobile-menu-btn" aria-label="菜单">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="3" y1="6" x2="21" y2="6"/>
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <line x1="3" y1="18" x2="21" y2="18"/>
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <button class="mobile-menu-close" aria-label="关闭菜单">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+        </button>
+        <a href="#features" class="mobile-menu-link">功能</a>
+        <a href="#models" class="mobile-menu-link">模型</a>
+        <a href="https://lookmore.cyou" class="mobile-menu-link">开始使用</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content reveal">
+            <p class="hero-label">AI 智能助手</p>
+            <h1>用 AI 重新定义<br>你的对话体验</h1>
+            <p class="hero-subtitle">LookMore 集成多种先进大语言模型，为你提供自然流畅的对话交互。</p>
+            <div class="hero-buttons">
+                <a href="https://lookmore.cyou" class="btn-primary">开始对话 →</a>
+                <a href="#features" class="btn-secondary">了解更多</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Feature Rows -->
+    <section id="features">
+        <!-- Feature 1: 极速响应 -->
+        <section class="feature-row">
+            <div class="feature-row-inner">
+                <div class="feature-visual reveal-left">
+                    <div class="feature-image-placeholder">⚡</div>
+                </div>
+                <div class="feature-text reveal-right">
+                    <p class="feature-label">极速响应</p>
+                    <h3>流式输出，实时可见</h3>
+                    <p>AI 的思考过程实时呈现，无需漫长等待。每一次对话都是即时的、自然的。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature 2: 多模型支持 -->
+        <section class="feature-row">
+            <div class="feature-row-inner">
+                <div class="feature-visual reveal-right">
+                    <div class="feature-image-placeholder">🧠</div>
+                </div>
+                <div class="feature-text reveal-left">
+                    <p class="feature-label">多模型支持</p>
+                    <h3>选择最适合的 AI</h3>
+                    <p>集成 GPT-4o、Claude、Gemini 等主流模型，按需选择，灵活切换。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature 3: 隐私保护 -->
+        <section class="feature-row">
+            <div class="feature-row-inner">
+                <div class="feature-visual reveal-left">
+                    <div class="feature-image-placeholder">🔒</div>
+                </div>
+                <div class="feature-text reveal-right">
+                    <p class="feature-label">隐私保护</p>
+                    <h3>你的数据，你做主</h3>
+                    <p>支持本地存储，对话数据不离开你的设备。安全、私密、可控。</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Feature 4: 跨平台 -->
+        <section class="feature-row">
+            <div class="feature-row-inner">
+                <div class="feature-visual reveal-right">
+                    <div class="feature-image-placeholder">📱</div>
+                </div>
+                <div class="feature-text reveal-left">
+                    <p class="feature-label">跨平台</p>
+                    <h3>随时随地，想用就用</h3>
+                    <p>支持微信小程序和网页端，手机、平板、电脑无缝切换。</p>
+                </div>
+            </div>
+        </section>
+    </section>
+
+    <!-- Model Grid -->
+    <section class="models" id="models">
+        <div class="section-container">
+            <div class="section-header reveal">
+                <p class="section-label">AI 模型</p>
+                <h2>多种先进模型</h2>
+                <p class="section-subtitle">根据你的需求选择最合适的 AI</p>
+            </div>
+            <div class="models-grid">
+                <div class="model-card reveal">
+                    <div class="model-icon">🤖</div>
+                    <div class="model-name">GPT-4o</div>
+                    <div class="model-provider">OpenAI</div>
+                </div>
+                <div class="model-card reveal">
+                    <div class="model-icon">🧠</div>
+                    <div class="model-name">Claude 3.5</div>
+                    <div class="model-provider">Anthropic</div>
+                </div>
+                <div class="model-card reveal">
+                    <div class="model-icon">💎</div>
+                    <div class="model-name">Gemini Pro</div>
+                    <div class="model-provider">Google</div>
+                </div>
+                <div class="model-card reveal">
+                    <div class="model-icon">🌀</div>
+                    <div class="model-name">Llama 3</div>
+                    <div class="model-provider">Meta</div>
+                </div>
+                <div class="model-card reveal">
+                    <div class="model-icon">🎯</div>
+                    <div class="model-name">DeepSeek</div>
+                    <div class="model-provider">深度求索</div>
+                </div>
+                <div class="model-card reveal">
+                    <div class="model-icon">✨</div>
+                    <div class="model-name">更多模型</div>
+                    <div class="model-provider">持续更新中</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="section-container reveal">
+            <h2>准备好开始了吗？</h2>
+            <p>立即体验 LookMore AI</p>
+            <a href="https://lookmore.cyou" class="btn-primary btn-large">免费开始使用 →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 LookMore. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        const navbar = document.querySelector('.navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 1) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuClose = document.querySelector('.mobile-menu-close');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        mobileMenuClose.addEventListener('click', () => {
+            mobileMenu.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -40px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Parallax scroll effect for feature images
+        let ticking = false;
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const scrolled = window.scrollY;
+                    document.querySelectorAll('.feature-image-placeholder').forEach(img => {
+                        const rect = img.getBoundingClientRect();
+                        const offset = (rect.top - window.innerHeight / 2) * 0.05;
+                        img.style.transform = `translateY(${offset}px)`;
+                    });
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
