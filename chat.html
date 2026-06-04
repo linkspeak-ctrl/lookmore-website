@@ -1272,7 +1272,6 @@
         let assistantMsgEl = null;
 
         function updateAssistantMessage(content, renderHtml, imgUrl) {
-            console.log('[MSG] updateAssistant renderHtml=' + renderHtml + ' content.length=' + (content||'').length + ' hasImage=' + (content||'').includes('![') + ' directImg=' + (imgUrl||'none'));
             // Remove typing indicator on first token
             const typingEl = document.getElementById('typingIndicator');
             if (typingEl) {
@@ -1284,12 +1283,9 @@
                 const msg = createMessageElement('assistant', content);
                 messageList.appendChild(msg);
                 assistantMsgEl = msg.querySelector('.message-bubble');
-                console.log('[MSG] Created assistant bubble, innerHTML preview:', assistantMsgEl.innerHTML.substring(0, 200));
-            } else if (renderHtml) {
-                assistantMsgEl.innerHTML = markdownToHtml(content);
-                console.log('[MSG] Updated assistant bubble innerHTML preview:', assistantMsgEl.innerHTML.substring(0, 200));
             } else {
-                assistantMsgEl.textContent = content;
+                // Always use innerHTML with markdown rendering to avoid flicker
+                assistantMsgEl.innerHTML = markdownToHtml(content);
             }
 
             // DIRECT FALLBACK: always inject image as DOM element if we have URL
@@ -1302,7 +1298,6 @@
                 img.onerror = function() { console.error('[IMG] Failed to load:', imgUrl); };
                 img.onload = function() { console.log('[IMG] Loaded successfully:', imgUrl.substring(0, 80)); };
                 assistantMsgEl.appendChild(img);
-                console.log('[MSG] Direct img element appended for:', imgUrl.substring(0, 80));
             }
 
             scrollToBottom();
