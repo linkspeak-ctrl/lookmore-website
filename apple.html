@@ -226,7 +226,7 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            padding: 120px 24px 80px;
+            padding: 80px 24px 60px;
             background: var(--white);
         }
 
@@ -321,7 +321,7 @@
 
         /* ===== Feature Rows ===== */
         .feature-row {
-            padding: 120px 24px;
+            padding: 80px 24px;
             background: var(--white);
         }
 
@@ -388,7 +388,7 @@
 
         /* ===== Model Grid ===== */
         .models {
-            padding: 160px 24px;
+            padding: 100px 24px;
             background: var(--white);
         }
 
@@ -454,7 +454,7 @@
 
         /* ===== CTA Section ===== */
         .cta {
-            padding: 160px 24px;
+            padding: 100px 24px;
             text-align: center;
             background: var(--white);
         }
@@ -518,6 +518,36 @@
             transform: translateX(0);
         }
 
+        /* Typewriter Animation - Looping */
+        .hero h1 .char {
+            opacity: 0;
+            transform: translateY(20px);
+            display: inline-block;
+            animation: char-loop 3s ease infinite;
+        }
+
+        .hero h1 .char.gradient-char {
+            background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-600) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes char-loop {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            5%, 80% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         /* ===== Responsive: 640px ===== */
         @media (min-width: 640px) {
             .hero-buttons {
@@ -536,12 +566,12 @@
             }
 
             .feature-row {
-                padding: 80px 16px;
+                padding: 60px 16px;
             }
 
             .feature-row-inner {
                 grid-template-columns: 1fr;
-                gap: 40px;
+                gap: 32px;
             }
 
             .feature-row:nth-child(even) .feature-row-inner {
@@ -553,7 +583,7 @@
             }
 
             .models {
-                padding: 80px 16px;
+                padding: 60px 16px;
             }
 
             .models-grid {
@@ -561,7 +591,7 @@
             }
 
             .cta {
-                padding: 80px 16px;
+                padding: 60px 16px;
             }
 
             .section-container {
@@ -572,7 +602,7 @@
         /* ===== Responsive: 480px ===== */
         @media (max-width: 480px) {
             .hero {
-                padding: 100px 16px 60px;
+                padding: 80px 16px 40px;
             }
 
             .hero-buttons {
@@ -586,11 +616,11 @@
             }
 
             .feature-row {
-                padding: 64px 16px;
+                padding: 48px 16px;
             }
 
             .feature-row-inner {
-                gap: 32px;
+                gap: 24px;
             }
 
             .feature-text h3 {
@@ -602,19 +632,19 @@
             }
 
             .model-card {
-                padding: 24px 16px;
+                padding: 20px 12px;
             }
 
             .model-icon {
-                font-size: 32px;
+                font-size: 28px;
             }
 
             .model-name {
-                font-size: 15px;
+                font-size: 14px;
             }
 
             .section-header {
-                margin-bottom: 40px;
+                margin-bottom: 32px;
             }
 
             .btn-large {
@@ -636,15 +666,15 @@
         /* ===== Responsive: 1280px ===== */
         @media (min-width: 1280px) {
             .feature-row {
-                padding: 200px 24px;
+                padding: 120px 24px;
             }
 
             .models {
-                padding: 200px 24px;
+                padding: 120px 24px;
             }
 
             .cta {
-                padding: 200px 24px;
+                padding: 120px 24px;
             }
         }
     </style>
@@ -692,7 +722,24 @@
     <section class="hero">
         <div class="hero-content reveal">
             <p class="hero-label">AI 智能助手</p>
-            <h1>用 AI 重新定义<br>你的对话体验</h1>
+            <h1 id="heroTitle">
+                <span class="char" style="animation-delay: 0.1s">用</span>
+                <span class="char" style="animation-delay: 0.15s"> </span>
+                <span class="char" style="animation-delay: 0.2s">A</span>
+                <span class="char" style="animation-delay: 0.25s">I</span>
+                <span class="char" style="animation-delay: 0.3s"> </span>
+                <span class="char gradient-char" style="animation-delay: 0.35s">重</span>
+                <span class="char gradient-char" style="animation-delay: 0.4s">新</span>
+                <span class="char gradient-char" style="animation-delay: 0.45s">定</span>
+                <span class="char gradient-char" style="animation-delay: 0.5s">义</span>
+                <br>
+                <span class="char" style="animation-delay: 0.7s">你</span>
+                <span class="char" style="animation-delay: 0.75s">的</span>
+                <span class="char" style="animation-delay: 0.8s">对</span>
+                <span class="char" style="animation-delay: 0.85s">话</span>
+                <span class="char" style="animation-delay: 0.9s">体</span>
+                <span class="char" style="animation-delay: 0.95s">验</span>
+            </h1>
             <p class="hero-subtitle">LookMore 集成多种先进大语言模型，为你提供自然流畅的对话交互。</p>
             <div class="hero-buttons">
                 <a href="https://lookmore.cyou" class="btn-primary">开始对话 →</a>
