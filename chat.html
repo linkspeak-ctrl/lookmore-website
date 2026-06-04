@@ -284,6 +284,7 @@
             border-radius: 12px;
             margin: 8px 0;
             display: block;
+            cursor: pointer;
         }
 
         .message-bubble p {
@@ -1135,6 +1136,7 @@
         async function sendToAPI(message, files) {
             assistantMsgEl = null;
             let fullText = '';
+            let imageUrl = null;
             let lastTextUpdate = 0;
             let lastHtmlUpdate = 0;
             let buffer = '';
@@ -1177,7 +1179,11 @@
                         if (imgUrl && !imgUrl.startsWith('data:') && !imgUrl.startsWith('http')) {
                             imgUrl = 'data:image/jpeg;base64,' + imgUrl;
                         }
-                        if (imgUrl) fullText += '\n\n![AI生成](' + imgUrl + ')';
+                        if (imgUrl) {
+                            imageUrl = imgUrl;
+                            fullText += '\n\n![AI生成](' + imgUrl + ')';
+                            console.log('[SSE] Image event received:', imgUrl.substring(0, 100));
+                        }
                     } else if (eventType === 'done') {
                         try { doneResult = JSON.parse(data); }
                         catch { doneResult = {}; }
@@ -1243,9 +1249,10 @@
                 }
 
                 // ALL events processed — now render final message
-                updateAssistantMessage(fullText || '', true);
+                console.log('[SSE] Final render: fullText.length=' + (fullText||'').length + ' imageUrl=' + imageUrl + ' doneResult=' + JSON.stringify(doneResult));
+                updateAssistantMessage(fullText || '', true, imageUrl);
                 if (fullText) {
-                    messages.push({ role: 'assistant', content: fullText });
+                    messages.push({ role: 'assistant', content: fullText, imageUrl: imageUrl || null });
                 }
                 if (doneResult && doneResult.conversationId) {
                     conversationId = doneResult.conversationId;
@@ -1264,8 +1271,8 @@
 
         let assistantMsgEl = null;
 
-        function updateAssistantMessage(content, renderHtml) {
-            console.log('[MSG] updateAssistant renderHtml=' + renderHtml + ' content.length=' + (content||'').length + ' hasImage=' + (content||'').includes('!['));
+        function updateAssistantMessage(content, renderHtml, imgUrl) {
+            console.log('[MSG] updateAssistant renderHtml=' + renderHtml + ' content.length=' + (content||'').length + ' hasImage=' + (content||'').includes('![') + ' directImg=' + (imgUrl||'none'));
             // Remove typing indicator on first token
             const typingEl = document.getElementById('typingIndicator');
             if (typingEl) {
@@ -1284,6 +1291,20 @@
             } else {
                 assistantMsgEl.textContent = content;
             }
+
+            // DIRECT FALLBACK: always inject image as DOM element if we have URL
+            if (imgUrl && !assistantMsgEl.querySelector('img[data-direct="true"]')) {
+                var img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = 'AI生成';
+                img.setAttribute('data-direct', 'true');
+                img.style.cssText = 'max-width:100%;height:auto;border-radius:12px;margin:8px 0;display:block;';
+                img.onerror = function() { console.error('[IMG] Failed to load:', imgUrl); };
+                img.onload = function() { console.log('[IMG] Loaded successfully:', imgUrl.substring(0, 80)); };
+                assistantMsgEl.appendChild(img);
+                console.log('[MSG] Direct img element appended for:', imgUrl.substring(0, 80));
+            }
+
             scrollToBottom();
         }
 
