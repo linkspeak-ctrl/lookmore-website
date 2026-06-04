@@ -798,19 +798,20 @@
             var html = [];
             var inCode = false;
             var codeLines = [];
+            var buf = [];
 
-            function flushText(lines) {
-                if (lines.length === 0) return '';
-                var text = lines.join('\n');
-                // Bold
+            function inline(text) {
                 text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-                // Italic
                 text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-                // Inline code
                 text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-                return text.split('\n').map(function(line) {
-                    return '<p>' + line + '</p>';
-                }).join('');
+                return text;
+            }
+
+            function flushText() {
+                if (buf.length) {
+                    buf.forEach(function(line) { html.push('<p>' + inline(line) + '</p>'); });
+                    buf = [];
+                }
             }
 
             for (var i = 0; i < lines.length; i++) {
@@ -823,6 +824,7 @@
                         codeLines = [];
                         inCode = false;
                     } else {
+                        flushText();
                         inCode = true;
                     }
                     continue;
@@ -835,38 +837,57 @@
 
                 // Empty line
                 if (!line.trim()) {
+                    flushText();
                     continue;
                 }
 
                 // Heading
                 var headingMatch = line.match(/^(#{1,6})\s+(.+)/);
                 if (headingMatch) {
+                    flushText();
                     var level = headingMatch[1].length;
-                    html.push('<h' + level + '>' + headingMatch[2] + '</h' + level + '>');
+                    html.push('<h' + level + '>' + inline(headingMatch[2]) + '</h' + level + '>');
                     continue;
                 }
 
-                // Unordered list
-                if (/^[-*]\s/.test(line)) {
-                    html.push('<ul><li>' + line.replace(/^[-*]\s/, '') + '</li></ul>');
-                    continue;
-                }
-
-                // Ordered list
+                // Ordered list - collect consecutive items
                 if (/^\d+\.\s/.test(line)) {
-                    html.push('<ol><li>' + line.replace(/^\d+\.\s/, '') + '</li></ol>');
+                    flushText();
+                    var olItems = [];
+                    while (i < lines.length && /^\d+\.\s/.test(lines[i])) {
+                        olItems.push('<li>' + inline(lines[i].replace(/^\d+\.\s/, '')) + '</li>');
+                        i++;
+                    }
+                    i--;
+                    html.push('<ol>' + olItems.join('') + '</ol>');
+                    continue;
+                }
+
+                // Unordered list - collect consecutive items
+                if (/^[-*]\s/.test(line)) {
+                    flushText();
+                    var ulItems = [];
+                    while (i < lines.length && /^[-*]\s/.test(lines[i])) {
+                        ulItems.push('<li>' + inline(lines[i].replace(/^[-*]\s/, '')) + '</li>');
+                        i++;
+                    }
+                    i--;
+                    html.push('<ul>' + ulItems.join('') + '</ul>');
                     continue;
                 }
 
                 // Blockquote
                 if (/^>\s/.test(line)) {
-                    html.push('<blockquote>' + line.replace(/^>\s/, '') + '</blockquote>');
+                    flushText();
+                    html.push('<blockquote>' + inline(line.replace(/^>\s/, '')) + '</blockquote>');
                     continue;
                 }
 
                 // Normal text
-                html.push('<p>' + line + '</p>');
+                buf.push(line);
             }
+
+            flushText();
 
             // Flush remaining code block
             if (inCode && codeLines.length) {
