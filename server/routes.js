@@ -20,6 +20,18 @@ const upload = multer({
   limits: { fileSize: 50 * 1024 * 1024 },
 });
 
+// Helper: save base64 image to file, return public URL
+function saveBase64Image(dataUrl) {
+  const match = dataUrl.match(/^data:image\/(\w+);base64,(.+)$/);
+  if (!match) return null;
+  const ext = match[1] === 'jpeg' ? 'jpg' : match[1];
+  const base64 = match[2];
+  const filename = `ai_${Date.now()}_${Math.random().toString(36).slice(2, 6)}.${ext}`;
+  const filePath = path.join(uploadDir, filename);
+  fs.writeFileSync(filePath, Buffer.from(base64, 'base64'));
+  return `/uploads/${filename}`;
+}
+
 router.get('/models', (req, res) => {
   try {
     const models = lazymanchat.getModels();
@@ -61,6 +73,13 @@ router.post('/chat', async (req, res) => {
       }
 
       if (result && result.imageUrl) {
+        // If it's a base64 data URI, save to file and return URL
+        if (result.imageUrl.startsWith('data:image')) {
+          const savedUrl = saveBase64Image(result.imageUrl);
+          if (savedUrl) {
+            result.imageUrl = `https://api.lookmore.cyou${savedUrl}`;
+          }
+        }
         res.write(`event: image\ndata: ${JSON.stringify(result.imageUrl)}\n\n`);
       }
 
@@ -72,6 +91,14 @@ router.post('/chat', async (req, res) => {
     const result = await lazymanchat.sendMessage(model, message || '', conversationId, files || [], req.userId);
     if (result && result.error) {
       return res.status(502).json({ error: result.error });
+    }
+
+    // If imageUrl is base64, save to file
+    if (result && result.imageUrl && result.imageUrl.startsWith('data:image')) {
+      const savedUrl = saveBase64Image(result.imageUrl);
+      if (savedUrl) {
+        result.imageUrl = `https://api.lookmore.cyou${savedUrl}`;
+      }
     }
 
     res.json({
