@@ -499,6 +499,35 @@
             margin-bottom: 32px;
         }
 
+        /* Typewriter Animation */
+        .welcome-title .char {
+            display: inline-block;
+            opacity: 0;
+            animation: charLoop 3s ease infinite;
+        }
+
+        .welcome-title .char.gradient-char {
+            background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-600) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        @keyframes charLoop {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(15px) scale(0.9);
+            }
+            5%, 80% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            85% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
         .welcome-suggestions {
             display: flex;
             flex-direction: column;
@@ -565,7 +594,17 @@
         <!-- Messages -->
         <div class="messages-container" id="messagesContainer">
             <div class="welcome-screen" id="welcomeScreen">
-                <h1 class="welcome-title">发现世界更多的可能</h1>
+                <h1 class="welcome-title">
+                    <span class="char" style="animation-delay:0.1s">发</span>
+                    <span class="char" style="animation-delay:0.15s">现</span>
+                    <span class="char" style="animation-delay:0.2s">世</span>
+                    <span class="char" style="animation-delay:0.25s">界</span>
+                    <span class="char" style="animation-delay:0.3s">更</span>
+                    <span class="char gradient-char" style="animation-delay:0.35s">多</span>
+                    <span class="char gradient-char" style="animation-delay:0.4s">的</span>
+                    <span class="char" style="animation-delay:0.45s">可</span>
+                    <span class="char" style="animation-delay:0.5s">能</span>
+                </h1>
                 <p class="welcome-subtitle">选择一个模型，开始对话</p>
                 <div class="welcome-suggestions">
                     <button class="suggestion-btn" onclick="sendSuggestion('帮我写一封工作邮件')">✉️ 帮我写一封工作邮件</button>
