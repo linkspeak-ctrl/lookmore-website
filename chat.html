@@ -81,13 +81,6 @@
             width: 100%;
         }
 
-        @media (min-width: 768px) {
-            .chat-header {
-                max-width: 100%;
-                padding: 12px 20px;
-            }
-        }
-
         .header-left {
             display: flex;
             align-items: center;
@@ -155,12 +148,9 @@
             scroll-behavior: smooth;
         }
 
-        @media (min-width: 768px) {
-            .messages-container {
-                max-width: 768px;
-                margin: 0 auto;
-                padding: 24px 20px;
-            }
+        .message-list {
+            max-width: 768px;
+            margin: 0 auto;
         }
 
         .message {
@@ -293,14 +283,6 @@
             width: 100%;
         }
 
-        @media (min-width: 768px) {
-            .input-area {
-                max-width: 768px;
-                margin: 0 auto;
-                padding: 16px 20px;
-            }
-        }
-
         .input-wrapper {
             display: flex;
             align-items: flex-end;
@@ -308,6 +290,8 @@
             background: var(--gray-100);
             border-radius: 24px;
             padding: 8px 8px 8px 16px;
+            max-width: 768px;
+            margin: 0 auto;
         }
 
         .upload-btn {
@@ -510,14 +494,8 @@
             height: 100%;
             text-align: center;
             padding: 40px 20px;
-        }
-
-        @media (min-width: 768px) {
-            .welcome-screen {
-                max-width: 768px;
-                margin: 0 auto;
-                width: 100%;
-            }
+            max-width: 768px;
+            margin: 0 auto;
         }
 
         .welcome-icon {
@@ -638,23 +616,25 @@
 
         <!-- Messages -->
         <div class="messages-container" id="messagesContainer">
-            <div class="welcome-screen" id="welcomeScreen">
-                <h1 class="welcome-title">
-                    <span class="char" style="animation-delay:0.1s">发</span>
-                    <span class="char" style="animation-delay:0.15s">现</span>
-                    <span class="char" style="animation-delay:0.2s">世</span>
-                    <span class="char" style="animation-delay:0.25s">界</span>
-                    <span class="char" style="animation-delay:0.3s">的</span>
-                    <span class="char" style="animation-delay:0.35s">更</span>
-                    <span class="char" style="animation-delay:0.4s">多</span>
-                    <span class="char" style="animation-delay:0.45s">可</span>
-                    <span class="char" style="animation-delay:0.5s">能</span>
-                </h1>
-                <p class="welcome-subtitle">选择一个模型，开始对话</p>
-                <div class="welcome-suggestions">
-                    <button class="suggestion-btn" onclick="sendSuggestion('帮我写一封工作邮件')">✉️ 帮我写一封工作邮件</button>
-                    <button class="suggestion-btn" onclick="sendSuggestion('解释一下量子计算的基本原理')">🧠 解释一下量子计算的基本原理</button>
-                    <button class="suggestion-btn" onclick="sendSuggestion('用Python写一个快速排序算法')">💻 用Python写一个快速排序算法</button>
+            <div class="message-list" id="messageList">
+                <div class="welcome-screen" id="welcomeScreen">
+                    <h1 class="welcome-title">
+                        <span class="char" style="animation-delay:0.1s">发</span>
+                        <span class="char" style="animation-delay:0.15s">现</span>
+                        <span class="char" style="animation-delay:0.2s">世</span>
+                        <span class="char" style="animation-delay:0.25s">界</span>
+                        <span class="char" style="animation-delay:0.3s">的</span>
+                        <span class="char" style="animation-delay:0.35s">更</span>
+                        <span class="char" style="animation-delay:0.4s">多</span>
+                        <span class="char" style="animation-delay:0.45s">可</span>
+                        <span class="char" style="animation-delay:0.5s">能</span>
+                    </h1>
+                    <p class="welcome-subtitle">选择一个模型，开始对话</p>
+                    <div class="welcome-suggestions">
+                        <button class="suggestion-btn" onclick="sendSuggestion('帮我写一封工作邮件')">✉️ 帮我写一封工作邮件</button>
+                        <button class="suggestion-btn" onclick="sendSuggestion('解释一下量子计算的基本原理')">🧠 解释一下量子计算的基本原理</button>
+                        <button class="suggestion-btn" onclick="sendSuggestion('用Python写一个快速排序算法')">💻 用Python写一个快速排序算法</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -838,6 +818,7 @@
 
         // ===== DOM Elements =====
         const messagesContainer = document.getElementById('messagesContainer');
+        const messageList = document.getElementById('messageList');
         const inputField = document.getElementById('inputField');
         const sendBtn = document.getElementById('sendBtn');
         const welcomeScreen = document.getElementById('welcomeScreen');
@@ -994,7 +975,7 @@
 
             // Add user message
             messages.push({ role: 'user', content: displayText });
-            messagesContainer.appendChild(createMessageElement('user', displayText));
+            messageList.appendChild(createMessageElement('user', displayText));
 
             // Clear input
             inputField.value = '';
@@ -1005,7 +986,7 @@
 
             // Show typing indicator
             const typingIndicator = createTypingIndicator();
-            messagesContainer.appendChild(typingIndicator);
+            messageList.appendChild(typingIndicator);
             scrollToBottom();
 
             // Send to API
@@ -1179,13 +1160,11 @@
             // Create assistant message element if not exists
             if (!assistantMsgEl) {
                 const msg = createMessageElement('assistant', content);
-                messagesContainer.appendChild(msg);
+                messageList.appendChild(msg);
                 assistantMsgEl = msg.querySelector('.message-bubble');
             } else if (renderHtml) {
-                // 200ms debounced: render full markdown
                 assistantMsgEl.innerHTML = markdownToHtml(content);
             } else {
-                // 10ms fast: plain text only for smooth streaming
                 assistantMsgEl.textContent = content;
             }
             scrollToBottom();
