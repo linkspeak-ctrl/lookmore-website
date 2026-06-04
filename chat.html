@@ -803,6 +803,7 @@
                 text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                 text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
                 text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+                text = text.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" style="max-width:100%;border-radius:12px;margin:8px 0;">');
                 return text;
             }
 
@@ -1198,7 +1199,8 @@
                                     try { fullText += JSON.parse(data); }
                                     catch { fullText += data; }
                                 } else if (eventType === 'image') {
-                                    // Handle image event
+                                    try { fullText += '\n\n![AI生成](' + JSON.parse(data) + ')'; }
+                                    catch {}
                                 } else if (eventType === 'done') {
                                     try {
                                         doFinish(JSON.parse(data));
