@@ -9,6 +9,15 @@ const routes = require('./routes');
 const app = express();
 app.use(express.json({ limit: '50mb' }));
 
+// CORS
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, X-User-Id');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
 app.use((req, res, next) => {
   req.userId = req.headers['x-user-id'] || '';
   next();
