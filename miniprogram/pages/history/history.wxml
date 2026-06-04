@@ -1,0 +1,43 @@
+<view class="container">
+  <view class="header">
+    <text class="header-title">历史会话</text>
+    <view class="header-new-btn" bindtap="onNewChat">
+      <text class="header-new-icon">+</text>
+    </view>
+  </view>
+
+  <scroll-view class="list" scroll-y refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <block wx:if="{{list.length > 0}}">
+      <view
+        class="item-wrapper"
+        wx:for="{{list}}"
+        wx:key="id"
+      >
+        <view class="item-delete-btn" catchtap="onDelete" data-id="{{item.id}}">删除</view>
+        <view
+          class="item-card"
+          style="transform: translateX({{item._swipeX || 0}}px); transition: transform {{item._swiping ? '0s' : '0.25s'}};"
+          bindtap="onTapItem"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd"
+          data-index="{{index}}"
+          data-id="{{item.id}}"
+        >
+          <text class="item-title">{{item.title}}</text>
+          <text class="item-arrow">›</text>
+        </view>
+      </view>
+    </block>
+    <block wx:elif="{{!loading}}">
+      <view class="empty">
+        <text class="empty-text">暂无历史会话</text>
+      </view>
+    </block>
+    <block wx:if="{{loading}}">
+      <view class="loading">
+        <text class="loading-text">加载中...</text>
+      </view>
+    </block>
+  </scroll-view>
+</view>

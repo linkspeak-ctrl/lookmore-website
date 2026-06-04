@@ -1,0 +1,105 @@
+<view class="container">
+  <view class="topbar">
+    <view class="topbar-capsule">
+      <text class="topbar-back" bindtap="goBack">←</text>
+      <text class="topbar-title" bindtap="toggleModelPopover">{{currentModelName}} ▾</text>
+      <text class="topbar-more" bindtap="onHistoryTap">☰</text>
+    </view>
+    <view wx:if="{{modelPopoverOpen}}" class="model-popover-mask" bindtap="closeModelPopover"></view>
+    <view wx:if="{{modelPopoverOpen}}" class="model-popover">
+      <text class="model-popover-title">选择模型</text>
+      <text class="model-popover-group">对话</text>
+      <view wx:for="{{chatModels}}" wx:key="id" class="model-popover-item {{currentModelId === item.id ? 'active' : ''}}" bindtap="selectModel" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+      <text class="model-popover-group">画图</text>
+      <view wx:for="{{imageModels}}" wx:key="id" class="model-popover-item {{currentModelId === item.id ? 'active' : ''}}" bindtap="selectModel" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+      <text class="model-popover-group">编程</text>
+      <view wx:for="{{codeModels}}" wx:key="id" class="model-popover-item {{currentModelId === item.id ? 'active' : ''}}" bindtap="selectModel" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+    </view>
+  </view>
+
+  <scroll-view class="messages" scroll-y scroll-into-view="{{scrollToId}}" scroll-with-animation bindscroll="onScroll">
+    <block wx:for="{{messages}}" wx:key="id">
+      <view class="msg-row {{item.role}}" id="msg-{{item.id}}">
+        <image wx:if="{{item.role === 'assistant'}}" class="msg-avatar ai-avatar" src="/images/ai-avatar-apple.png" mode="aspectFill"></image>
+        <view class="msg-col {{item.role}}">
+          <view class="msg-bubble {{item.role}}">
+            <view wx:if="{{item.role === 'assistant' && item.htmlContent}}" class="bubble-inner">
+              <rich-text nodes="{{item.htmlContent}}"></rich-text>
+              <text class="selectable-overlay" selectable="{{true}}">{{item.plainContent}}</text>
+            </view>
+            <text wx:elif="{{item.content}}" selectable="{{true}}">{{item.content}}</text>
+            <text wx:elif="{{item.role === 'assistant'}}" class="loading-dots">...</text>
+            <image wx:if="{{item.imageUrl}}" class="msg-image" src="{{item.imageUrl}}" mode="aspectFit" bindtap="previewImage" bindlongpress="saveImage" data-url="{{item.imageUrl}}"></image>
+          </view>
+          <image wx:if="{{item.content}}" class="copy-btn" bindtap="copyMessage" data-content="{{item.content}}" src="/images/copy-icon.png" mode="aspectFit"></image>
+        </view>
+        <image wx:if="{{item.role === 'user'}}" class="msg-avatar user-avatar" src="{{userAvatar}}" mode="aspectFill" binderror="onAvatarError"></image>
+      </view>
+    </block>
+    <view id="msg-bottom"></view>
+  </scroll-view>
+
+  <view wx:if="{{pendingFiles.length}}" class="file-chips">
+    <view class="file-chip" wx:for="{{pendingFiles}}" wx:key="index">
+      <text class="file-chip-name">{{item.name}}</text>
+      <text class="file-chip-remove" bindtap="removeFile" data-index="{{index}}">×</text>
+    </view>
+  </view>
+
+  <view wx:if="{{isDesktop}}" class="desktop-drop-zone" bindtap="chooseFile">
+    <view class="drop-zone-inner">
+      <text class="drop-zone-icon">+</text>
+      <text class="drop-zone-text">点击上传文件</text>
+      <text class="drop-zone-hint">支持图片、视频、文档</text>
+    </view>
+  </view>
+
+  <view class="input-area" style="padding-bottom: {{keyboardHeight > 0 ? 8 : 0}}px;">
+    <view class="input-card">
+      <input class="input-box" value="{{inputText}}" bindinput="onInput" placeholder="输入消息..." confirm-type="send" bindconfirm="send" cursor-spacing="12"/>
+      <view class="send-btn" bindtap="send">↑</view>
+      <view class="upload-btn" bindtap="chooseFile">+</view>
+    </view>
+  </view>
+
+  <view wx:if="{{showHistory}}" class="history-backdrop" bindtap="closeHistory"></view>
+  <view class="history-drawer {{showHistory ? 'drawer-open' : ''}}">
+    <view class="history-header">
+      <text class="history-header-title">历史会话</text>
+      <view class="history-new-btn" bindtap="onHistoryNewChat">
+        <text class="history-new-icon">+</text>
+      </view>
+    </view>
+    <scroll-view class="history-list" scroll-y refresher-enabled refresher-triggered="{{historyRefreshing}}" bindrefresherrefresh="onHistoryRefresh">
+      <block wx:if="{{historyList.length > 0}}">
+        <view class="history-item-wrapper" wx:for="{{historyList}}" wx:key="id">
+          <view class="history-delete-btn" catchtap="onHistoryDelete" data-id="{{item.id}}">删除</view>
+          <view
+            class="history-item-card"
+            style="transform: translateX({{item._swipeX || 0}}px); transition: transform {{item._swiping ? '0s' : '0.25s'}};"
+            bindtap="onHistoryTapItem"
+            bindtouchstart="onHistoryTouchStart"
+            bindtouchmove="onHistoryTouchMove"
+            bindtouchend="onHistoryTouchEnd"
+            data-index="{{index}}"
+            data-id="{{item.id}}"
+          >
+            <text class="history-item-title">{{item.title}}</text>
+            <text class="history-item-arrow">›</text>
+          </view>
+        </view>
+      </block>
+      <block wx:elif="{{!historyLoading}}">
+        <view class="history-empty">
+          <text class="history-empty-text">暂无历史会话</text>
+        </view>
+      </block>
+      <block wx:if="{{historyLoading}}">
+        <view class="history-loading">
+          <text class="history-loading-text">加载中...</text>
+        </view>
+      </block>
+    </scroll-view>
+  </view>
+
+</view>

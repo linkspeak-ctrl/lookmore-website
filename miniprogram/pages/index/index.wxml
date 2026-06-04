@@ -1,0 +1,59 @@
+<view class="container" style="padding-bottom: {{keyboardHeight > 0 ? 12 : 0}}px;">
+  <view class="logo-area">
+    <image class="logo-icon" src="/images/ai-avatar-apple.png" mode="aspectFill"></image>
+    <text class="brand-name">LookMore</text>
+    <text class="brand-sub">智能助手</text>
+  </view>
+
+  <view class="model-area">
+    <text class="model-capsule" bindtap="togglePopover">{{selectedModel}} ▾</text>
+
+    <view wx:if="{{popoverOpen}}" class="popover-mask" bindtap="closePopover"></view>
+    <view wx:if="{{popoverOpen}}" class="popover" style="position:absolute;">
+      <text class="popover-title">选择模型</text>
+      <text class="popover-group-title">对话</text>
+      <view wx:for="{{chatModels}}" wx:key="id" class="popover-item {{selectedModelId === item.id ? 'active' : ''}}" bindtap="selectModelPopover" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+      <text class="popover-group-title">画图</text>
+      <view wx:for="{{imageModels}}" wx:key="id" class="popover-item {{selectedModelId === item.id ? 'active' : ''}}" bindtap="selectModelPopover" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+      <text class="popover-group-title">编程</text>
+      <view wx:for="{{codeModels}}" wx:key="id" class="popover-item {{selectedModelId === item.id ? 'active' : ''}}" bindtap="selectModelPopover" data-name="{{item.name}}" data-id="{{item.id}}">{{item.name}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{pendingFiles.length}}" class="file-chips">
+    <view class="file-chip" wx:for="{{pendingFiles}}" wx:key="index">
+      <text class="file-chip-name">{{item.name}}</text>
+      <text class="file-chip-remove" bindtap="removeFile" data-index="{{index}}">×</text>
+    </view>
+  </view>
+
+  <view class="dialog-card">
+    <view class="dialog-inner">
+      <input class="dialog-input" value="{{inputText}}" bindinput="onInput" placeholder="输入你想了解的内容..." confirm-type="send" bindconfirm="sendMessage" cursor-spacing="12"/>
+      <view class="dialog-send" bindtap="sendMessage">↑</view>
+      <view class="dialog-upload" bindtap="chooseFile">+</view>
+    </view>
+  </view>
+
+  <view class="history-entry" bindtap="onHistoryTap">
+    <text class="history-entry-text">历史会话 ›</text>
+  </view>
+
+  <view wx:if="{{isDesktop}}" class="desktop-drop-zone" bindtap="chooseFile">
+    <view class="drop-zone-inner">
+      <text class="drop-zone-icon">+</text>
+      <text class="drop-zone-text">点击上传文件</text>
+      <text class="drop-zone-hint">支持图片、视频、文档</text>
+    </view>
+  </view>
+
+  <view wx:if="{{showAuth}}" class="auth-overlay">
+    <view class="auth-card">
+      <image class="auth-logo" src="/images/avatar.png" mode="aspectFill"></image>
+      <text class="auth-title">欢迎使用 LookMore</text>
+      <text class="auth-desc">授权获取你的微信头像和昵称</text>
+      <button class="auth-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">选择微信头像</button>
+      <text class="auth-skip" bindtap="skipAuth">暂不授权</text>
+    </view>
+  </view>
+</view>

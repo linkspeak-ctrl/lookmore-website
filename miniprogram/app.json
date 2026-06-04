@@ -1,0 +1,13 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/chat/chat",
+    "pages/history/history"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#EFEBE9",
+    "navigationBarTitleText": "LookMore",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#EFEBE9"
+  }
+}

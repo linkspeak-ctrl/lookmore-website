@@ -1,0 +1,34 @@
+/* Apple visionOS 空间风格 — 全局配色 */
+page {
+  --primary: #007AFF;
+  --primary-glow: rgba(0,122,255,0.30);
+  --bg: #F2F2F7;
+  --bg-gradient-start: #E8E8ED;
+  --bg-gradient-end: #FAFAFA;
+  --surface: rgba(255,255,255,0.68);
+  --surface-light: rgba(255,255,255,0.55);
+  --surface-heavy: rgba(255,255,255,0.72);
+  --text-primary: #1D1D1F;
+  --text-secondary: #8E8E93;
+  --text-placeholder: #AEAEB2;
+  --orange: #FF9500;
+  --border-subtle: rgba(0,0,0,0.06);
+
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(255,255,255,0.5) inset;
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(255,255,255,0.7) inset, 0 0 30px rgba(0,122,255,0.06);
+  --shadow-blue-btn: 0 4px 14px rgba(0,122,255,0.35);
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-full: 99px;
+
+  font-family: 'PingFang SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg);
+  font-size: 14px;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
