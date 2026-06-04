@@ -203,6 +203,77 @@
             margin-top: 8px;
         }
 
+        .message-bubble strong {
+            font-weight: 600;
+        }
+
+        .message-bubble code {
+            background: rgba(0, 0, 0, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 13px;
+        }
+
+        .message.user .message-bubble code {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .message-bubble pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 12px 14px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 8px 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .message-bubble pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+            font-size: inherit;
+        }
+
+        .message-bubble ul,
+        .message-bubble ol {
+            margin: 4px 0;
+            padding-left: 20px;
+        }
+
+        .message-bubble li {
+            margin: 2px 0;
+        }
+
+        .message-bubble blockquote {
+            border-left: 3px solid var(--gray-300, #d1d5db);
+            padding-left: 12px;
+            margin: 8px 0;
+            color: var(--gray-600);
+        }
+
+        .message-bubble hr {
+            border: none;
+            border-top: 1px solid var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .message-bubble a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .message-bubble p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .message-bubble p + p {
+            margin-top: 8px;
+        }
+
         .message-bubble code {
             background: rgba(0, 0, 0, 0.06);
             padding: 2px 6px;
@@ -718,22 +789,27 @@
     <script>
         // ===== Markdown Parser =====
         function escapeHtml(text) {
-            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         }
 
         function parseInline(text) {
-            const codeMap = [];
-            let out = escapeHtml(text);
-            out = out.replace(/`([^`]+)`/g, function(_, code) {
-                codeMap.push(code);
-                return '\x00C' + (codeMap.length - 1) + '\x00';
+            // First extract inline code to protect from other replacements
+            var codes = [];
+            var out = text.replace(/`([^`]+)`/g, function(_, code) {
+                codes.push(code);
+                return '\x00CODE' + (codes.length - 1) + '\x00';
             });
+            // Escape HTML in non-code parts
+            out = escapeHtml(out);
+            // Bold
             out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            // Italic
             out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            // Strikethrough
             out = out.replace(/~~(.+?)~~/g, '<del>$1</del>');
-            out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-            out = out.replace(/\x00C(\d+)\x00/g, function(_, i) {
-                return '<code>' + escapeHtml(codeMap[+i]) + '</code>';
+            // Restore code spans with escaped content
+            out = out.replace(/\x00CODE(\d+)\x00/g, function(_, i) {
+                return '<code>' + escapeHtml(codes[+i]) + '</code>';
             });
             return out;
         }
@@ -755,9 +831,11 @@
 
             for (var i = 0; i < lines.length; i++) {
                 var line = lines[i];
-                if (line.startsWith('```')) {
+                // Code block
+                if (line.trim().startsWith('```')) {
                     if (inCode) {
-                        html.push('<pre><code>' + codeLines.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
+                        var escaped = escapeHtml(codeLines.join('\n'));
+                        html.push('<pre><code>' + escaped + '</code></pre>');
                         codeLines = [];
                         inCode = false;
                     } else {
@@ -770,30 +848,49 @@
                     codeLines.push(line);
                     continue;
                 }
+                // Empty line
                 if (!line.trim()) {
                     flush();
                     continue;
                 }
+                // Ordered list
                 if (/^\d+\.\s/.test(line)) {
                     flush();
                     html.push('<ol><li>' + parseInline(line.replace(/^\d+\.\s/, '')) + '</li></ol>');
                     continue;
                 }
+                // Unordered list
                 if (/^[-*]\s/.test(line)) {
                     flush();
                     html.push('<ul><li>' + parseInline(line.replace(/^[-*]\s/, '')) + '</li></ul>');
                     continue;
                 }
+                // Heading
                 if (/^#{1,6}\s/.test(line)) {
                     flush();
                     var level = line.match(/^(#{1,6})/)[1].length;
                     html.push('<h' + level + '>' + parseInline(line.replace(/^#{1,6}\s/, '')) + '</h' + level + '>');
                     continue;
                 }
+                // Blockquote
+                if (/^>\s/.test(line)) {
+                    flush();
+                    html.push('<blockquote>' + parseInline(line.replace(/^>\s/, '')) + '</blockquote>');
+                    continue;
+                }
+                // Horizontal rule
+                if (/^[-*_]{3,}$/.test(line.trim())) {
+                    flush();
+                    html.push('<hr>');
+                    continue;
+                }
+                // Normal paragraph line
                 buf.push(parseInline(line));
             }
-            if (inCode) {
-                html.push('<pre><code>' + codeLines.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
+            // Flush remaining code block
+            if (inCode && codeLines.length) {
+                var escaped = escapeHtml(codeLines.join('\n'));
+                html.push('<pre><code>' + escaped + '</code></pre>');
             }
             flush();
             return html.join('');
