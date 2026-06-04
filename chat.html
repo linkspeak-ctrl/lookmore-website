@@ -1151,7 +1151,7 @@
                 }
 
                 const reader = response.body.getReader();
-                const decoder = new TextDecoder();
+                const decoder = new TextDecoder('utf-8');
                 let streamDone = false;
                 let finished = false;
 
