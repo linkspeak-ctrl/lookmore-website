@@ -630,6 +630,89 @@
     </div>
 
     <script>
+        // ===== Markdown Parser =====
+        function escapeHtml(text) {
+            return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        function parseInline(text) {
+            const codeMap = [];
+            let out = escapeHtml(text);
+            out = out.replace(/`([^`]+)`/g, function(_, code) {
+                codeMap.push(code);
+                return '\x00C' + (codeMap.length - 1) + '\x00';
+            });
+            out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
+            out = out.replace(/~~(.+?)~~/g, '<del>$1</del>');
+            out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+            out = out.replace(/\x00C(\d+)\x00/g, function(_, i) {
+                return '<code>' + escapeHtml(codeMap[+i]) + '</code>';
+            });
+            return out;
+        }
+
+        function markdownToHtml(md) {
+            if (!md) return '';
+            var lines = md.split('\n');
+            var html = [];
+            var inCode = false;
+            var codeLines = [];
+            var buf = [];
+
+            function flush() {
+                if (buf.length) {
+                    html.push('<p>' + buf.join('<br>') + '</p>');
+                    buf = [];
+                }
+            }
+
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i];
+                if (line.startsWith('```')) {
+                    if (inCode) {
+                        html.push('<pre><code>' + codeLines.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
+                        codeLines = [];
+                        inCode = false;
+                    } else {
+                        flush();
+                        inCode = true;
+                    }
+                    continue;
+                }
+                if (inCode) {
+                    codeLines.push(line);
+                    continue;
+                }
+                if (!line.trim()) {
+                    flush();
+                    continue;
+                }
+                if (/^\d+\.\s/.test(line)) {
+                    flush();
+                    html.push('<ol><li>' + parseInline(line.replace(/^\d+\.\s/, '')) + '</li></ol>');
+                    continue;
+                }
+                if (/^[-*]\s/.test(line)) {
+                    flush();
+                    html.push('<ul><li>' + parseInline(line.replace(/^[-*]\s/, '')) + '</li></ul>');
+                    continue;
+                }
+                if (/^#{1,6}\s/.test(line)) {
+                    flush();
+                    var level = line.match(/^(#{1,6})/)[1].length;
+                    html.push('<h' + level + '>' + parseInline(line.replace(/^#{1,6}\s/, '')) + '</h' + level + '>');
+                    continue;
+                }
+                buf.push(parseInline(line));
+            }
+            if (inCode) {
+                html.push('<pre><code>' + codeLines.join('\n').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</code></pre>');
+            }
+            flush();
+            return html.join('');
+        }
+
         // ===== Configuration =====
         const API_BASE = 'https://api.lookmore.cyou';
         const USER_ID = 'web_' + Math.random().toString(36).substr(2, 9);
@@ -891,7 +974,7 @@
                 messagesContainer.appendChild(msg);
                 assistantMsgEl = msg.querySelector('.message-bubble');
             } else {
-                assistantMsgEl.textContent = content;
+                assistantMsgEl.innerHTML = markdownToHtml(content);
             }
             scrollToBottom();
         }
