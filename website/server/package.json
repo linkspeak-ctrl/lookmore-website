@@ -1,0 +1,19 @@
+{
+  "name": "lookmore-chat-server",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.11.0"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.0",
+    "express": "^4.21.0",
+    "multer": "^2.1.1",
+    "undici": "^8.3.0",
+    "ws": "^8.20.1"
+  }
+}

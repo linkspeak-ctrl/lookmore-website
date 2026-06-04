@@ -1,0 +1,118 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg);
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+.header-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.header-new-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--surface-heavy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+.header-new-icon {
+  font-size: 20px;
+  color: var(--primary);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* ── List ── */
+.list {
+  flex: 1;
+  padding: 0 16px;
+}
+
+/* ── Item wrapper (contains hidden delete + card) ── */
+.item-wrapper {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 8px;
+  border-radius: var(--radius-md);
+}
+
+/* Delete button hidden behind card */
+.item-delete-btn {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 64px;
+  background: #FF3B30;
+  color: #fff;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+}
+
+/* Card slides over delete button */
+.item-card {
+  position: relative;
+  z-index: 1;
+  background: var(--surface-heavy);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+.item-title {
+  font-size: 14px;
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+.item-arrow {
+  font-size: 16px;
+  color: var(--text-placeholder);
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+/* ── Empty state ── */
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 120px;
+}
+.empty-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ── Loading ── */
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-top: 60px;
+}
+.loading-text {
+  font-size: 13px;
+  color: var(--text-placeholder);
+}

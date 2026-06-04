@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        width: 1920px; height: 1080px;
+        overflow: hidden;
+        background: #000000;
+        font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      #root {
+        position: relative;
+        width: 1920px; height: 1080px;
+      }
+
+      .clip {
+        position: absolute;
+        visibility: hidden;
+      }
+
+      /* ========== INTRO SCENE ========== */
+
+      #intro-bg {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        z-index: 10;
+        background:
+          radial-gradient(ellipse 70% 55% at 50% 42%, rgba(22,22,28,0.7) 0%, transparent 70%),
+          radial-gradient(ellipse 90% 70% at 50% 50%, rgba(0,0,0,0) 0%, #000000 100%);
+      }
+
+      /* outer ring */
+      #intro-ring-outer {
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0px; height: 0px;
+        margin-top: -16px;
+        border-radius: 50%;
+        border: 1px solid rgba(200,169,96,0.18);
+        z-index: 11;
+      }
+
+      /* inner ring */
+      #intro-ring-inner {
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0px; height: 0px;
+        margin-top: -16px;
+        border-radius: 50%;
+        border: 0.5px solid rgba(200,169,96,0.25);
+        z-index: 12;
+      }
+
+      /* light streak */
+      #intro-streak {
+        top: 38%; left: -400px;
+        width: 600px; height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(200,169,96,0.3), rgba(255,255,255,0.15), transparent);
+        z-index: 13;
+        transform: rotate(-25deg);
+      }
+
+      /* floating accent orbs */
+      #intro-orb-1 {
+        top: 30%; left: 28%;
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: rgba(200,169,96,0.5);
+        z-index: 11;
+        box-shadow: 0 0 12px rgba(200,169,96,0.3), 0 0 40px rgba(200,169,96,0.1);
+      }
+      #intro-orb-2 {
+        top: 62%; left: 72%;
+        width: 3px; height: 3px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.4);
+        z-index: 11;
+        box-shadow: 0 0 8px rgba(255,255,255,0.2);
+      }
+      #intro-orb-3 {
+        top: 44%; left: 22%;
+        width: 2px; height: 2px;
+        border-radius: 50%;
+        background: rgba(200,169,96,0.35);
+        z-index: 11;
+        box-shadow: 0 0 6px rgba(200,169,96,0.2);
+      }
+
+      /* intro text */
+      #intro-content {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        z-index: 14;
+      }
+
+      #intro-name {
+        font-size: 96px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        color: #ffffff;
+        line-height: 1;
+        text-shadow: 0 0 80px rgba(200,169,96,0.12);
+      }
+
+      #intro-divider {
+        width: 44px; height: 1px;
+        background: rgba(200,169,96,0.5);
+        margin: 30px auto;
+      }
+
+      #intro-title {
+        font-size: 26px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.68);
+        line-height: 1.4;
+      }
+
+      /* bottom brand mark */
+      #intro-brand {
+        position: absolute;
+        bottom: 72px; left: 0;
+        width: 1920px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        z-index: 14;
+      }
+      #intro-brand-dot {
+        width: 4px; height: 4px;
+        border-radius: 50%;
+        background: rgba(200,169,96,0.55);
+      }
+      #intro-brand-text {
+        font-size: 18px;
+        font-weight: 600;
+        letter-spacing: 0.16em;
+        color: rgba(255,255,255,0.45);
+      }
+
+      /* ========== FLASH TRANSITION ========== */
+
+      #flash-overlay {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        background: rgba(255,255,255,0.06);
+        z-index: 15;
+      }
+
+      /* ========== MAIN VIDEO ========== */
+
+      #main-video {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        object-fit: cover;
+        z-index: 1;
+      }
+
+      #video-vignette {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        z-index: 2;
+        background: radial-gradient(ellipse 72% 62% at 50% 50%, transparent 48%, rgba(0,0,0,0.28) 100%);
+      }
+
+      /* ========== LOWER THIRD ========== */
+
+      #lower-third {
+        bottom: 160px; left: 80px;
+        z-index: 5;
+        display: flex;
+        align-items: center;
+        gap: 22px;
+        background: rgba(28,28,30,0.52);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-radius: 22px;
+        padding: 18px 36px;
+        border: 0.5px solid rgba(255,255,255,0.07);
+      }
+
+      #lower-third-accent {
+        width: 2px; height: 40px;
+        border-radius: 1px;
+        background: linear-gradient(180deg, rgba(200,169,96,0.6), rgba(200,169,96,0.2));
+      }
+
+      #lower-third-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      #lower-third-name {
+        font-size: 24px;
+        font-weight: 600;
+        color: #ffffff;
+        letter-spacing: 0.05em;
+        line-height: 1;
+      }
+
+      #lower-third-title {
+        font-size: 16px;
+        font-weight: 400;
+        color: rgba(255,255,255,0.5);
+        letter-spacing: 0.07em;
+      }
+
+      /* ========== OUTRO SCENE ========== */
+
+      #outro-bg {
+        top: 0; left: 0;
+        width: 1920px; height: 1080px;
+        z-index: 20;
+        background:
+          radial-gradient(ellipse 60% 50% at 50% 44%, rgba(22,22,28,0.7) 0%, transparent 70%),
+          radial-gradient(ellipse 80% 60% at 50% 50%, rgba(0,0,0,0) 0%, #000000 100%);
+      }
+
+      /* outro rings — mirror intro */
+      #outro-ring-outer {
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0px; height: 0px;
+        margin-top: -10px;
+        border-radius: 50%;
+        border: 1px solid rgba(200,169,96,0.15);
+        z-index: 21;
+      }
+      #outro-ring-inner {
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        width: 0px; height: 0px;
+        margin-top: -10px;
+        border-radius: 50%;
+        border: 0.5px solid rgba(200,169,96,0.22);
+        z-index: 22;
+      }
+
+      #outro-content {
+        top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 23;
+      }
+
+      #outro-brand-logo {
+        font-size: 52px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #ffffff;
+        line-height: 1;
+      }
+
+      #outro-divider {
+        width: 44px; height: 1px;
+        background: rgba(200,169,96,0.4);
+        margin: 28px auto;
+      }
+
+      #outro-tagline {
+        font-size: 22px;
+        font-weight: 400;
+        letter-spacing: 0.1em;
+        color: rgba(255,255,255,0.5);
+      }
+    </style>
+  </head>
+  <body>
+
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="35"
+      data-width="1920"
+      data-height="1080"
+    >
+
+      <!-- ===== 主视频 ===== -->
+      <video
+        id="main-video"
+        class="clip"
+        data-start="6"
+        data-duration="24"
+        data-track-index="0"
+        src="assets/source-video.mp4"
+        muted
+        playsinline
+      ></video>
+      <audio
+        id="main-audio"
+        class="clip"
+        data-start="6"
+        data-duration="24"
+        data-track-index="99"
+        src="assets/source-video.mp4"
+      ></audio>
+      <div id="video-vignette" class="clip" data-start="6" data-duration="24" data-track-index="1"></div>
+
+      <!-- ===== 开场画面 ===== -->
+      <div id="intro-bg" class="clip" data-start="0" data-duration="6" data-track-index="10"></div>
+
+      <div id="intro-ring-outer" class="clip" data-start="0" data-duration="6" data-track-index="11"></div>
+      <div id="intro-ring-inner" class="clip" data-start="0" data-duration="6" data-track-index="12"></div>
+
+      <div id="intro-orb-1" class="clip" data-start="0" data-duration="6" data-track-index="13"></div>
+      <div id="intro-orb-2" class="clip" data-start="0" data-duration="6" data-track-index="17"></div>
+      <div id="intro-orb-3" class="clip" data-start="0" data-duration="6" data-track-index="19"></div>
+
+      <div id="intro-streak" class="clip" data-start="0" data-duration="6" data-track-index="14"></div>
+
+      <div id="intro-content" class="clip" data-start="0" data-duration="6" data-track-index="15">
+        <div id="intro-name">刘杨</div>
+        <div id="intro-divider"></div>
+        <div id="intro-title">浙江中公教育面试高级讲师</div>
+      </div>
+
+      <div id="intro-brand" class="clip" data-start="0" data-duration="6" data-track-index="16">
+        <div id="intro-brand-dot"></div>
+        <div id="intro-brand-text">中公教育</div>
+      </div>
+
+      <!-- ===== 转场闪光 ===== -->
+      <div id="flash-overlay" class="clip" data-start="5.6" data-duration="0.8" data-track-index="18"></div>
+
+      <!-- ===== 内容区底部标签 ===== -->
+      <div id="lower-third" class="clip" data-start="7" data-duration="23" data-track-index="20">
+        <div id="lower-third-accent"></div>
+        <div id="lower-third-info">
+          <div id="lower-third-name">刘杨</div>
+          <div id="lower-third-title">浙江中公教育 · 面试高级讲师</div>
+        </div>
+      </div>
+
+      <!-- ===== 结尾画面 ===== -->
+      <div id="outro-bg" class="clip" data-start="30" data-duration="5" data-track-index="30"></div>
+
+      <div id="outro-ring-outer" class="clip" data-start="30" data-duration="5" data-track-index="31"></div>
+      <div id="outro-ring-inner" class="clip" data-start="30" data-duration="5" data-track-index="32"></div>
+
+      <div id="outro-content" class="clip" data-start="30" data-duration="5" data-track-index="33">
+        <div id="outro-brand-logo">中公教育</div>
+        <div id="outro-divider"></div>
+        <div id="outro-tagline">给改变未来的力量</div>
+      </div>
+
+    </div>
+
+    <script>
+      window.__timelines = window.__timelines || {};
+      var tl = gsap.timeline({ paused: true });
+
+      // ==============================
+      // INTRO (0-6s)
+      // ==============================
+
+      // Background fades in
+      tl.from("#intro-bg",          { opacity: 0, duration: 1.0, ease: "power2.out" }, 0);
+
+      // Outer ring expands from center
+      tl.from("#intro-ring-outer",  { width: 0, height: 0, opacity: 0, duration: 1.5, ease: "power3.out" }, 0.2);
+      tl.set("#intro-ring-outer",   { width: 420, height: 420 }, 1.7);
+
+      // Inner ring follows slightly delayed
+      tl.from("#intro-ring-inner",  { width: 0, height: 0, opacity: 0, duration: 1.3, ease: "power3.out" }, 0.5);
+      tl.set("#intro-ring-inner",   { width: 260, height: 260 }, 1.8);
+
+      // Floating orbs fade in
+      tl.from("#intro-orb-1",       { opacity: 0, scale: 0, duration: 0.6, ease: "power3.out" }, 0.8);
+      tl.from("#intro-orb-2",       { opacity: 0, scale: 0, duration: 0.6, ease: "power3.out" }, 1.0);
+      tl.from("#intro-orb-3",       { opacity: 0, scale: 0, duration: 0.6, ease: "power3.out" }, 1.1);
+
+      // Light streak sweeps across
+      tl.from("#intro-streak",      { opacity: 0, left: -400, duration: 1.2, ease: "power2.out" }, 0.6);
+      tl.to("#intro-streak",        { left: 2400, duration: 2.5, ease: "power2.in" }, 1.8);
+
+      // Name appears
+      tl.from("#intro-name",        { opacity: 0, y: 40, duration: 1.0, ease: "power3.out" }, 0.5);
+
+      // Divider stretches
+      tl.from("#intro-divider",     { scaleX: 0, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.9);
+
+      // Title fades up
+      tl.from("#intro-title",       { opacity: 0, y: 24, duration: 0.8, ease: "power3.out" }, 1.2);
+
+      // Brand mark
+      tl.from("#intro-brand",       { opacity: 0, duration: 1.0, ease: "power3.out" }, 1.8);
+
+      // Subtle drift on orbs during intro hold
+      tl.to("#intro-orb-1",         { y: -20, duration: 3, ease: "none" }, 2.0);
+      tl.to("#intro-orb-2",         { y: 15, duration: 3, ease: "none" }, 2.0);
+      tl.to("#intro-orb-3",         { y: -10, duration: 3, ease: "none" }, 2.0);
+
+      // ==============================
+      // TRANSITION: Intro → Content
+      // ==============================
+
+      // Flash overlay — quick white burst
+      tl.set("#flash-overlay",      { opacity: 0 }, 5.6);
+      tl.to("#flash-overlay",       { opacity: 1, duration: 0.12, ease: "power2.out" }, 5.6);
+      tl.to("#flash-overlay",       { opacity: 0, duration: 0.25, ease: "power2.in" }, 5.72);
+
+      // Intro elements scale up + blur out simultaneously
+      tl.to("#intro-bg",            { opacity: 0, scale: 1.06, duration: 0.7, ease: "power3.in" }, 5.3);
+      tl.to("#intro-ring-outer",    { opacity: 0, scale: 1.1, duration: 0.55, ease: "power3.in" }, 5.3);
+      tl.to("#intro-ring-inner",    { opacity: 0, scale: 1.1, duration: 0.5, ease: "power3.in" }, 5.3);
+      tl.to("#intro-content",       { opacity: 0, y: -20, duration: 0.5, ease: "power3.in" }, 5.3);
+      tl.to("#intro-brand",         { opacity: 0, y: 12, duration: 0.5, ease: "power3.in" }, 5.3);
+      tl.to("#intro-orb-1",         { opacity: 0, duration: 0.4 }, 5.3);
+      tl.to("#intro-orb-2",         { opacity: 0, duration: 0.4 }, 5.3);
+      tl.to("#intro-orb-3",         { opacity: 0, duration: 0.4 }, 5.3);
+      tl.to("#intro-streak",        { opacity: 0, duration: 0.35 }, 5.3);
+
+      // Hard kills
+      tl.set("#intro-bg",           { opacity: 0, scale: 1, }, 6);
+      tl.set("#intro-ring-outer",   { opacity: 0, scale: 1, width: 0, height: 0 }, 6);
+      tl.set("#intro-ring-inner",   { opacity: 0, scale: 1, width: 0, height: 0 }, 6);
+      tl.set("#intro-content",      { opacity: 0 }, 6);
+      tl.set("#intro-brand",        { opacity: 0 }, 6);
+      tl.set("#intro-orb-1",        { opacity: 0 }, 6);
+      tl.set("#intro-orb-2",        { opacity: 0 }, 6);
+      tl.set("#intro-orb-3",        { opacity: 0 }, 6);
+      tl.set("#intro-streak",       { opacity: 0, left: 2400 }, 5.60);
+      tl.set("#intro-streak",       { opacity: 0, left: 2400 }, 6);
+      tl.set("#flash-overlay",      { opacity: 0 }, 6);
+
+      // ==============================
+      // CONTENT (6-30s)
+      // ==============================
+
+      // Video scales in from 1.05 → 1.0 (post-flash settle)
+      tl.from("#main-video",        { scale: 1.05, opacity: 0.4, duration: 0.8, ease: "power3.out" }, 6);
+      tl.set("#main-video",         { scale: 1, opacity: 1 }, 6.8);
+
+      // Vignette
+      tl.from("#video-vignette",    { opacity: 0, duration: 0.8 }, 6);
+
+      // Lower third slides up (from below)
+      tl.from("#lower-third",       { opacity: 0, y: 36, duration: 0.75, ease: "power3.out" }, 7.2);
+
+      // ==============================
+      // TRANSITION: Content → Outro
+      // ==============================
+
+      // Video scales down slightly + fades
+      tl.to("#main-video",          { scale: 1.04, opacity: 0, duration: 0.7, ease: "power3.in" }, 30);
+      tl.to("#video-vignette",      { opacity: 0, duration: 0.45 }, 30);
+      tl.to("#lower-third",         { opacity: 0, y: 20, duration: 0.4, ease: "power3.in" }, 30);
+
+      tl.set("#main-video",         { scale: 1, opacity: 0 }, 30.7);
+      tl.set("#video-vignette",     { opacity: 0 }, 30.45);
+      tl.set("#lower-third",        { opacity: 0 }, 30.4);
+
+      // ==============================
+      // OUTRO (30-35s)
+      // ==============================
+
+      tl.set("#outro-bg",           { opacity: 1 }, 30.5);
+
+      // Rings expand — mirror the intro
+      tl.from("#outro-ring-outer",  { width: 0, height: 0, opacity: 0, duration: 1.4, ease: "power3.out" }, 30.6);
+      tl.set("#outro-ring-outer",   { width: 360, height: 360 }, 32.0);
+      tl.from("#outro-ring-inner",  { width: 0, height: 0, opacity: 0, duration: 1.2, ease: "power3.out" }, 30.8);
+      tl.set("#outro-ring-inner",   { width: 200, height: 200 }, 32.0);
+
+      // Brand content
+      tl.from("#outro-brand-logo",  { opacity: 0, y: 32, duration: 0.9, ease: "power3.out" }, 31.0);
+      tl.from("#outro-divider",     { scaleX: 0, opacity: 0, duration: 0.6, ease: "power3.out" }, 31.4);
+      tl.from("#outro-tagline",     { opacity: 0, y: 18, duration: 0.7, ease: "power3.out" }, 31.6);
+
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
