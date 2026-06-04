@@ -278,6 +278,14 @@
             text-decoration: underline;
         }
 
+        .message-bubble img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 8px 0;
+            display: block;
+        }
+
         .message-bubble p {
             margin: 0;
             padding: 0;
@@ -1235,6 +1243,34 @@
                     }
                 }
 
+                // Process any remaining buffer (catch events that arrived with final chunk)
+                if (buffer.trim()) {
+                    console.log('[SSE] Remaining buffer after stream:', buffer.substring(0, 200));
+                    const remainingLines = buffer.split('\n');
+                    let remEventType = '';
+                    for (const line of remainingLines) {
+                        if (line.startsWith('event: ')) {
+                            remEventType = line.slice(7).trim();
+                        } else if (line.startsWith('data: ')) {
+                            const data = line.slice(6);
+                            if (remEventType === 'image') {
+                                let imgUrl = '';
+                                try { imgUrl = JSON.parse(data); }
+                                catch { imgUrl = data; }
+                                if (imgUrl && !imgUrl.startsWith('data:') && !imgUrl.startsWith('http')) {
+                                    imgUrl = 'data:image/jpeg;base64,' + imgUrl;
+                                }
+                                if (imgUrl) fullText += '\n\n![AI生成](' + imgUrl + ')';
+                                console.log('[SSE] Recovered image event:', imgUrl.substring(0, 100));
+                            } else if (remEventType === 'done') {
+                                try { doFinish(JSON.parse(data)); }
+                                catch { doFinish({}); }
+                            }
+                        }
+                    }
+                    buffer = '';
+                }
+
                 // Final flush
                 if (!finished) {
                     doFinish({});
@@ -1254,6 +1290,7 @@
         let assistantMsgEl = null;
 
         function updateAssistantMessage(content, renderHtml) {
+            console.log('[MSG] updateAssistant renderHtml=' + renderHtml + ' content.length=' + (content||'').length + ' hasImage=' + (content||'').includes('!['));
             // Remove typing indicator on first token
             const typingEl = document.getElementById('typingIndicator');
             if (typingEl) {
@@ -1265,8 +1302,10 @@
                 const msg = createMessageElement('assistant', content);
                 messageList.appendChild(msg);
                 assistantMsgEl = msg.querySelector('.message-bubble');
+                console.log('[MSG] Created assistant bubble, innerHTML preview:', assistantMsgEl.innerHTML.substring(0, 200));
             } else if (renderHtml) {
                 assistantMsgEl.innerHTML = markdownToHtml(content);
+                console.log('[MSG] Updated assistant bubble innerHTML preview:', assistantMsgEl.innerHTML.substring(0, 200));
             } else {
                 assistantMsgEl.textContent = content;
             }
@@ -1280,6 +1319,13 @@
 
         // ===== Init =====
         inputField.focus();
+
+        // Image click handler - open in new tab
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'IMG' && e.target.closest('.message-bubble')) {
+                window.open(e.target.src, '_blank');
+            }
+        });
     </script>
 </body>
 </html>
