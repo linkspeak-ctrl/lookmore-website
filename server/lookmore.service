@@ -1,0 +1,15 @@
+[Unit]
+Description=LookMore Chat Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/lookmore-server
+ExecStart=/usr/bin/node /opt/lookmore-server/index.js
+Restart=on-failure
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

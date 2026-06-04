@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lookmore - 预览</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #f5f5f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+.phone {
+  width: 375px; height: 812px;
+  background: #f5f5f5;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 0 0 2px #333, 0 0 0 4px #555, 0 20px 60px rgba(0,0,0,0.3);
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.page.active { display: flex; }
+
+/* Brand Header */
+.brand-header {
+  background: #fff;
+  padding: 44px 16px 12px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+.brand-header .title {
+  font-size: 18px; font-weight: 700; color: #07c160;
+  letter-spacing: 2px;
+}
+.brand-header .subtitle {
+  font-size: 11px; color: #999; margin-top: 2px;
+}
+
+/* Conversation List */
+.conv-list { flex: 1; overflow-y: auto; padding: 12px 16px; }
+.conv-card {
+  background: #fff; border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 10px;
+  display: flex; justify-content: space-between; align-items: center;
+  cursor: pointer; transition: transform 0.15s;
+}
+.conv-card:active { transform: scale(0.98); }
+.conv-card .info { flex: 1; min-width: 0; }
+.conv-card .info .title {
+  font-size: 15px; font-weight: 600; color: #333;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.conv-card .info .meta {
+  font-size: 12px; color: #999; margin-top: 4px;
+  display: flex; gap: 12px;
+}
+.conv-card .info .meta .model-tag {
+  background: #e8f8ef; color: #07c160; padding: 1px 6px; border-radius: 3px;
+  font-size: 11px;
+}
+.conv-card .time { font-size: 11px; color: #bbb; white-space: nowrap; }
+.empty-state {
+  text-align: center; padding: 80px 20px 0; color: #ccc;
+}
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state .text { font-size: 14px; }
+.new-btn {
+  position: absolute; bottom: 24px; right: 16px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: #07c160; color: #fff; border: none;
+  font-size: 28px; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(7,193,96,0.35);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 10;
+}
+.new-btn:active { opacity: 0.8; }
+
+/* Chat Page */
+.chat-header {
+  background: #fff; padding: 44px 16px 12px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid #eee;
+}
+.chat-header .back {
+  width: 28px; height: 28px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #333;
+}
+.chat-header .conv-title {
+  font-size: 15px; font-weight: 600; color: #333;
+  flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.model-tags {
+  padding: 10px 16px; background: #fff;
+  display: flex; gap: 8px; overflow-x: auto;
+  border-bottom: 1px solid #f0f0f0;
+}
+.model-tags::-webkit-scrollbar { display: none; }
+.model-tag-btn {
+  padding: 5px 12px; border-radius: 16px; border: 1px solid #e0e0e0;
+  background: #fafafa; font-size: 12px; color: #666; white-space: nowrap;
+  cursor: pointer; transition: all 0.2s;
+}
+.model-tag-btn.active { background: #07c160; color: #fff; border-color: #07c160; }
+.model-tag-btn.more {
+  background: #fff; color: #07c160; border: 1px dashed #07c160;
+}
+.messages { flex: 1; overflow-y: auto; padding: 12px 16px; }
+.msg-bubble {
+  margin-bottom: 14px; display: flex; flex-direction: column;
+}
+.msg-bubble.user { align-items: flex-end; }
+.msg-bubble.assistant { align-items: flex-start; }
+.msg-bubble .bubble {
+  max-width: 78%; padding: 10px 14px; border-radius: 12px;
+  font-size: 14px; line-height: 1.6; word-break: break-word;
+}
+.msg-bubble.user .bubble {
+  background: #07c160; color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.msg-bubble.assistant .bubble {
+  background: #fff; color: #333;
+  border-bottom-left-radius: 4px;
+}
+.msg-bubble .bubble img { max-width: 100%; border-radius: 8px; margin-top: 6px; }
+.msg-bubble .model-label {
+  font-size: 10px; color: #07c160; margin-bottom: 3px; margin-left: 2px;
+}
+.input-area {
+  background: #fff; padding: 8px 12px 20px;
+  display: flex; align-items: flex-end; gap: 8px;
+  border-top: 1px solid #eee;
+}
+.input-area .file-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #f5f5f5; border: none; font-size: 18px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  color: #999; flex-shrink: 0;
+}
+.input-area .text-input {
+  flex: 1; border: 1px solid #e8e8e8; border-radius: 20px;
+  padding: 8px 14px; font-size: 14px; outline: none; resize: none;
+  max-height: 80px; line-height: 1.4;
+}
+.input-area .text-input:focus { border-color: #07c160; }
+.input-area .send-btn {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: #07c160; color: #fff; border: none;
+  font-size: 16px; cursor: pointer; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.file-chips { padding: 4px 12px; display: flex; gap: 6px; flex-wrap: wrap; background: #fff; }
+.file-chip {
+  background: #f0f0f0; border-radius: 6px; padding: 3px 8px;
+  font-size: 11px; color: #666; display: flex; align-items: center; gap: 4px;
+}
+.file-chip .remove { color: #ccc; cursor: pointer; }
+
+/* Models Page */
+.models-header {
+  background: #fff; padding: 44px 16px 12px;
+  display: flex; align-items: center; gap: 12px;
+  border-bottom: 1px solid #eee;
+}
+.models-header .back {
+  width: 28px; height: 28px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px; color: #333;
+}
+.models-header .page-title { font-size: 17px; font-weight: 600; color: #333; }
+.tabs {
+  display: flex; background: #fff; border-bottom: 1px solid #eee;
+}
+.tab {
+  flex: 1; text-align: center; padding: 12px 0;
+  font-size: 14px; color: #999; cursor: pointer;
+  position: relative; transition: color 0.2s;
+}
+.tab.active { color: #07c160; font-weight: 600; }
+.tab.active::after {
+  content: ''; position: absolute; bottom: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 28px; height: 3px; background: #07c160; border-radius: 2px;
+}
+.models-list { flex: 1; overflow-y: auto; padding: 12px 16px; }
+.model-card {
+  background: #fff; border-radius: 10px; padding: 14px 16px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
+  cursor: pointer; transition: all 0.2s;
+}
+.model-card.selected { border: 1.5px solid #07c160; background: #f8fff8; }
+.model-card .model-info { flex: 1; }
+.model-card .model-name { font-size: 15px; font-weight: 500; color: #333; }
+.model-card .model-provider { font-size: 11px; color: #999; margin-top: 2px; }
+.model-card .radio {
+  width: 20px; height: 20px; border-radius: 50%;
+  border: 2px solid #ddd; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.2s;
+}
+.model-card.selected .radio {
+  border-color: #07c160;
+}
+.model-card.selected .radio::after {
+  content: ''; width: 10px; height: 10px; border-radius: 50%;
+  background: #07c160;
+}
+.models-list .category-title {
+  font-size: 12px; color: #999; padding: 8px 4px 6px; font-weight: 500;
+}
+.confirm-bar {
+  background: #fff; padding: 12px 16px 20px; border-top: 1px solid #eee;
+}
+.confirm-btn {
+  width: 100%; padding: 12px; border-radius: 24px;
+  background: #07c160; color: #fff; border: none;
+  font-size: 16px; font-weight: 600; cursor: pointer;
+}
+.confirm-btn:active { opacity: 0.85; }
+
+/* Toast */
+.toast {
+  position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.75); color: #fff; padding: 8px 20px;
+  border-radius: 20px; font-size: 13px; z-index: 100;
+  pointer-events: none; opacity: 0; transition: opacity 0.3s;
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="phone" id="app">
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- PAGE: Conversation List -->
+  <div class="page active" id="page-index">
+    <div class="brand-header">
+      <div class="title">Lookmore</div>
+      <div class="subtitle">AI 对话助手</div>
+    </div>
+    <div class="conv-list" id="conv-list">
+      <div class="conv-card" data-id="1" data-model="GPT-5.5" onclick="openChat('1', 'GPT-5.5模型探索', 'GPT-5.5')">
+        <div class="info">
+          <div class="title">GPT-5.5 模型探索</div>
+          <div class="meta">
+            <span class="model-tag">GPT-5.5</span>
+            <span>6 条消息</span>
+          </div>
+        </div>
+        <div class="time">10:32</div>
+      </div>
+      <div class="conv-card" data-id="2" data-model="Claude-Opus-4.7" onclick="openChat('2', '代码重构方案', 'Claude-Opus-4.7')">
+        <div class="info">
+          <div class="title">代码重构方案</div>
+          <div class="meta">
+            <span class="model-tag">Claude-Opus-4.7</span>
+            <span>12 条消息</span>
+          </div>
+        </div>
+        <div class="time">昨天</div>
+      </div>
+      <div class="conv-card" data-id="3" data-model="Nano Banan 2" onclick="openChat('3', '生成一张猫咪图片', 'Nano Banan 2')">
+        <div class="info">
+          <div class="title">生成一张猫咪图片</div>
+          <div class="meta">
+            <span class="model-tag">Nano Banan 2</span>
+            <span>4 条消息</span>
+          </div>
+        </div>
+        <div class="time">昨天</div>
+      </div>
+      <div class="conv-card" data-id="4" data-model="Gemini-3.1-pro" onclick="openChat('4', 'Gemini 翻译测试', 'Gemini-3.1-pro')">
+        <div class="info">
+          <div class="title">Gemini 翻译测试</div>
+          <div class="meta">
+            <span class="model-tag">Gemini-3.1-pro</span>
+            <span>8 条消息</span>
+          </div>
+        </div>
+        <div class="time">周三</div>
+      </div>
+    </div>
+    <div class="empty-state" id="empty-state" style="display:none">
+      <div class="icon">💬</div>
+      <div class="text">还没有对话，点击下方按钮开始</div>
+    </div>
+    <button class="new-btn" onclick="openNewChat()" title="新建对话">+</button>
+  </div>
+
+  <!-- PAGE: Chat -->
+  <div class="page" id="page-chat">
+    <div class="chat-header">
+      <div class="back" onclick="goBack('index')">&#8592;</div>
+      <div class="conv-title" id="chat-title">对话</div>
+    </div>
+    <div class="model-tags" id="model-tags">
+      <div class="model-tag-btn active" data-model="GPT-5.5">GPT-5.5</div>
+      <div class="model-tag-btn" data-model="GPT-5.4">GPT-5.4</div>
+      <div class="model-tag-btn" data-model="GPT-4.1 mini">GPT-4.1 mini</div>
+      <div class="model-tag-btn" data-model="Claude-Opus-4.7">Claude-Opus-4.7</div>
+      <div class="model-tag-btn" data-model="Claude-Sonnet-4.6">Claude-Sonnet-4.6</div>
+      <div class="model-tag-btn" data-model="Gemini-3.1-pro">Gemini-3.1-pro</div>
+      <div class="model-tag-btn more" onclick="openModels()">+ 更多</div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="file-chips" id="file-chips"></div>
+    <div class="input-area">
+      <button class="file-btn" onclick="showToast('文件上传（演示）')">+</button>
+      <input class="text-input" id="msg-input" placeholder="输入消息..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage();}">
+      <button class="send-btn" onclick="sendMessage()">&#8593;</button>
+    </div>
+  </div>
+
+  <!-- PAGE: Models -->
+  <div class="page" id="page-models">
+    <div class="models-header">
+      <div class="back" onclick="goBack('chat')">&#8592;</div>
+      <div class="page-title">选择模型</div>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-tab="basic" onclick="switchTab('basic')">基础模型</div>
+      <div class="tab" data-tab="enhanced" onclick="switchTab('enhanced')">增强模型</div>
+    </div>
+    <div class="models-list" id="models-list"></div>
+    <div class="confirm-bar">
+      <button class="confirm-btn" onclick="confirmModel()">确认选择</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// State
+let currentPage = 'index';
+let currentConvId = null;
+let selectedModel = 'GPT-5.5';
+let currentTab = 'basic';
+let files = [];
+
+const models = {
+  basic: [
+    { id: 'gpt-5.4-mini', name: 'GPT-5.4-mini', provider: 'OpenAI', category: 'chat' },
+    { id: 'gpt-4.1-mini', name: 'GPT-4.1 mini', provider: 'OpenAI', category: 'chat' },
+    { id: 'gemini-3-flash-preview', name: 'Gemini-3-flash', provider: 'Google', category: 'chat' },
+    { id: 'gpt-image-2', name: 'GPT-image-2', provider: 'OpenAI', category: 'image' },
+    { id: 'gemini-3.1-flash-image-preview', name: 'Nano Banan 2', provider: 'Google', category: 'image' },
+  ],
+  enhanced: [
+    { id: 'gpt-5.5', name: 'GPT-5.5', provider: 'OpenAI', category: 'chat' },
+    { id: 'gpt-5.4', name: 'GPT-5.4', provider: 'OpenAI', category: 'chat' },
+    { id: 'gemini-2.5-pro', name: 'Gemini-2.5-pro', provider: 'Google', category: 'chat' },
+    { id: 'gemini-3.1-pro-preview', name: 'Gemini-3.1-pro', provider: 'Google', category: 'chat' },
+    { id: 'claude-opus-4-6', name: 'Claude-Opus-4.6', provider: 'Anthropic', category: 'code' },
+    { id: 'claude-opus-4-7', name: 'Claude-Opus-4.7', provider: 'Anthropic', category: 'code' },
+    { id: 'claude-sonnet-4-6', name: 'Claude-Sonnet-4.6', provider: 'Anthropic', category: 'code' },
+    { id: 'gemini-3-pro-image', name: 'Nano Banan Pro', provider: 'Google', category: 'image' },
+  ],
+};
+
+// Navigation
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  currentPage = name;
+}
+
+function goBack(target) { showPage(target); }
+function openModels() {
+  showPage('models');
+  currentTab = 'basic';
+  document.querySelectorAll('#page-models .tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  renderModelList();
+}
+
+function openChat(id, title, model) {
+  currentConvId = id;
+  selectedModel = model;
+  document.getElementById('chat-title').textContent = title;
+  showPage('chat');
+  updateModelTags();
+  loadMessages(id);
+}
+
+function openNewChat() {
+  currentConvId = null;
+  selectedModel = 'GPT-5.5';
+  document.getElementById('chat-title').textContent = '新建对话';
+  document.getElementById('messages').innerHTML = '';
+  document.getElementById('msg-input').value = '';
+  files = [];
+  updateFileChips();
+  updateModelTags();
+  showPage('chat');
+}
+
+// Model tags in chat
+function updateModelTags() {
+  document.querySelectorAll('#model-tags .model-tag-btn:not(.more)').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.model === selectedModel);
+  });
+}
+
+document.getElementById('model-tags').addEventListener('click', function(e) {
+  const btn = e.target.closest('.model-tag-btn:not(.more)');
+  if (btn) {
+    selectedModel = btn.dataset.model;
+    updateModelTags();
+  }
+});
+
+// Messages
+const mockMessages = {
+  '1': [
+    { role: 'user', content: '你好，GPT-5.5 和 GPT-5.4 的主要区别是什么？' },
+    { role: 'assistant', content: 'GPT-5.5 相比 GPT-5.4 有了显著提升，主要体现在：\n\n1. **推理能力**：更复杂的逻辑推理和多步骤问题解决\n2. **代码生成**：更准确的代码理解和生成\n3. **多模态**：更强的图像理解和生成能力\n4. **上下文长度**：支持更长的上下文窗口\n\n总体来说，GPT-5.5 是目前最先进的模型之一。', model: 'GPT-5.5' },
+    { role: 'user', content: '能给我写一个 Python 快速排序的例子吗？' },
+    { role: 'assistant', content: '当然可以！这是一个 Python 快速排序实现：\n\n```python\ndef quicksort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quicksort(left) + middle + quicksort(right)\n```\n\n这个实现使用列表推导式，代码简洁易懂。时间复杂度平均为 O(n log n)。', model: 'GPT-5.5' },
+  ],
+  '2': [
+    { role: 'user', content: '我们有一个大型 React 项目需要重构，你有什么建议？' },
+    { role: 'assistant', content: '对于大型 React 项目重构，我建议按以下步骤进行：\n\n1. **建立测试覆盖**：重构前确保有足够的测试\n2. **组件拆分**：将大组件拆分为小的、可复用的组件\n3. **状态管理优化**：评估是否需要 Redux/Zustand/Jotai\n4. **TypeScript 迁移**：逐步引入类型安全\n5. **性能优化**：使用 React.memo、useMemo、useCallback\n6. **代码分割**：使用 React.lazy 和 Suspense\n\n需要针对具体项目给出更详细的方案。', model: 'Claude-Opus-4.7' },
+    { role: 'user', content: '具体说一下第二点，组件拆分的策略' },
+    { role: 'assistant', content: '组件拆分遵循几个核心原则：\n\n**单一职责**：每个组件只做一件事\n\n**拆分信号**：\n- 组件超过 200 行\n- 有重复的 UI 模式\n- 逻辑可以独立测试\n- props 传递层级过深\n\n**实用策略**：\n1. 先提取展示组件（Presentational）\n2. 再提取容器组件（Container）\n3. 最后提取自定义 Hooks\n\n```jsx\n// 拆分前：一个巨大的组件\nfunction Dashboard() { /* 300+ 行 */ }\n\n// 拆分后\nfunction Dashboard() {\n  return (\n    <Layout>\n      <Sidebar />\n      <MainContent>\n        <StatsCards />\n        <RecentActivity />\n        <ChartSection />\n      </MainContent>\n    </Layout>\n  );\n}\n```', model: 'Claude-Opus-4.7' },
+  ],
+  '3': [
+    { role: 'user', content: '请生成一张可爱的橘猫图片' },
+    { role: 'assistant', content: '已为你生成一张可爱的橘猫图片：\n\n![橘猫](https://placekitten.com/400/300)', model: 'Nano Banan 2' },
+  ],
+  '4': [
+    { role: 'user', content: '请把以下中文翻译成英文：人工智能正在改变我们的生活方式。' },
+    { role: 'assistant', content: '翻译结果：\n\n**原文**：人工智能正在改变我们的生活方式。\n**译文**：Artificial intelligence is transforming the way we live.\n\n也可以译为：AI is reshaping our lifestyle.', model: 'Gemini-3.1-pro' },
+  ],
+};
+
+function loadMessages(id) {
+  const msgs = mockMessages[id] || [];
+  const container = document.getElementById('messages');
+  container.innerHTML = msgs.map(m => renderBubble(m)).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+function renderBubble(m) {
+  if (m.role === 'user') {
+    return `<div class="msg-bubble user"><div class="bubble">${escapeHtml(m.content)}</div></div>`;
+  }
+  return `<div class="msg-bubble assistant"><div class="model-label">${m.model || ''}</div><div class="bubble">${formatContent(m.content)}</div></div>`;
+}
+
+function escapeHtml(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function formatContent(text) {
+  let html = escapeHtml(text);
+  html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre style="background:#f5f5f5;padding:8px;border-radius:6px;overflow-x:auto;font-size:12px;"><code>$2</code></pre>');
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1">');
+  html = html.replace(/\n/g, '<br>');
+  return html;
+}
+
+function sendMessage() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text && files.length === 0) return;
+
+  const container = document.getElementById('messages');
+
+  if (text) {
+    container.insertAdjacentHTML('beforeend', renderBubble({ role: 'user', content: text }));
+  }
+
+  input.value = '';
+  container.scrollTop = container.scrollHeight;
+
+  // Simulate AI response
+  const typingHtml = `<div class="msg-bubble assistant" id="typing"><div class="model-label">${selectedModel}</div><div class="bubble" style="color:#999">正在输入...</div></div>`;
+  container.insertAdjacentHTML('beforeend', typingHtml);
+  container.scrollTop = container.scrollHeight;
+
+  setTimeout(() => {
+    const typing = document.getElementById('typing');
+    if (typing) {
+      const reply = getMockReply(text);
+      typing.outerHTML = renderBubble({ role: 'assistant', content: reply, model: selectedModel });
+      container.scrollTop = container.scrollHeight;
+    }
+  }, 1200);
+}
+
+function getMockReply(input) {
+  if (!input) return '请发送一条消息。';
+  if (input.includes('你好') || input.includes('hello')) return '你好！有什么可以帮助你的吗？';
+  if (input.includes('图') || input.includes('画')) return '图片生成功能需要在真实环境中连接 AI 服务。在浏览器预览中，这里展示的是模拟界面效果。';
+  return `收到你的消息："${input.slice(0, 30)}${input.length > 30 ? '...' : ''}"\n\n这是浏览器预览的模拟回复。实际使用时，这里会是 AI 模型的真实回复内容。`;
+}
+
+// File chips
+function updateFileChips() {
+  const container = document.getElementById('file-chips');
+  container.innerHTML = files.map((f, i) =>
+    `<div class="file-chip">${f.name}<span class="remove" onclick="removeFile(${i})">x</span></div>`
+  ).join('');
+}
+
+function removeFile(i) { files.splice(i, 1); updateFileChips(); }
+
+// Models page
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('#page-models .tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderModelList();
+}
+
+function renderModelList() {
+  const list = models[currentTab] || [];
+  const container = document.getElementById('models-list');
+  let html = '';
+  const cats = {};
+  list.forEach(m => {
+    if (!cats[m.category]) cats[m.category] = [];
+    cats[m.category].push(m);
+  });
+  const catNames = { chat: '对话模型', code: '代码模型', image: '图像模型' };
+  for (const [cat, items] of Object.entries(cats)) {
+    html += `<div class="category-title">${catNames[cat] || cat}</div>`;
+    items.forEach(m => {
+      const sel = selectedModel === m.name;
+      html += `<div class="model-card${sel ? ' selected' : ''}" onclick="selectModel('${m.name}')">
+        <div class="model-info"><div class="model-name">${m.name}</div><div class="model-provider">${m.provider}</div></div>
+        <div class="radio"></div>
+      </div>`;
+    });
+  }
+  container.innerHTML = html;
+}
+
+function selectModel(name) {
+  selectedModel = name;
+  renderModelList();
+}
+
+function confirmModel() {
+  updateModelTags();
+  showPage('chat');
+  showToast('已选择 ' + selectedModel);
+}
+
+// Toast
+let toastTimer;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// Init
+renderModelList();
+</script>
+
+</body>
+</html>
