@@ -131,60 +131,21 @@
 
         .message {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             animation: message-in 0.3s ease;
-            align-items: flex-start;
         }
 
         .message.user {
-            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
         }
 
         @keyframes message-in {
-            from {
-                opacity: 0;
-                transform: translateY(12px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .message-avatar-wrap {
-            flex-shrink: 0;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: flex-start;
-            padding-top: 4px;
-        }
-
-        .message-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 15px;
-            flex-shrink: 0;
-        }
-
-        .message-avatar.user {
-            background: linear-gradient(135deg, var(--purple-500) 0%, var(--purple-600) 100%);
-            color: white;
-        }
-
-        .message-avatar.assistant {
-            background: var(--gray-100);
-        }
-
-        .message-avatar.assistant svg {
-            width: 18px;
-            height: 18px;
-            color: var(--purple-500);
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .message-content {
@@ -193,8 +154,8 @@
         }
 
         .message-bubble {
-            padding: 12px 16px;
-            border-radius: 18px;
+            padding: 14px 18px;
+            border-radius: 20px;
             font-size: 15px;
             line-height: 1.55;
             word-wrap: break-word;
@@ -202,7 +163,7 @@
         }
 
         .message.user .message-bubble {
-            background: var(--purple-500);
+            background: var(--gray-800);
             color: white;
             border-bottom-right-radius: 4px;
         }
@@ -230,6 +191,15 @@
             font-size: 14px;
         }
 
+        .message-bubble p { margin: 0; padding: 0; }
+        .message-bubble p + p { margin-top: 8px; }
+        .message-bubble code {
+            background: rgba(0, 0, 0, 0.06);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 14px;
+        }
         .message.user .message-bubble code {
             background: rgba(255, 255, 255, 0.2);
         }
@@ -833,30 +803,17 @@
         function createMessageElement(role, content) {
             const div = document.createElement('div');
             div.className = `message ${role}`;
-
-            // Avatar
-            const avatarWrap = document.createElement('div');
-            avatarWrap.className = 'message-avatar-wrap';
-            const avatar = document.createElement('div');
-            avatar.className = `message-avatar ${role}`;
-            if (role === 'assistant') {
-                avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-            } else {
-                avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
-            }
-            avatarWrap.appendChild(avatar);
-
-            // Bubble
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
-            bubble.textContent = content;
+            if (role === 'assistant') {
+                bubble.innerHTML = markdownToHtml(content);
+            } else {
+                bubble.textContent = content;
+            }
             contentDiv.appendChild(bubble);
-
-            div.appendChild(avatarWrap);
             div.appendChild(contentDiv);
-
             return div;
         }
 
@@ -864,24 +821,13 @@
             const div = document.createElement('div');
             div.className = 'message assistant';
             div.id = 'typingIndicator';
-
-            const avatarWrap = document.createElement('div');
-            avatarWrap.className = 'message-avatar-wrap';
-            const avatar = document.createElement('div');
-            avatar.className = 'message-avatar assistant';
-            avatar.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`;
-            avatarWrap.appendChild(avatar);
-
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
             const bubble = document.createElement('div');
             bubble.className = 'message-bubble';
-            bubble.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+            bubble.innerHTML = '<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
             contentDiv.appendChild(bubble);
-
-            div.appendChild(avatarWrap);
             div.appendChild(contentDiv);
-
             return div;
         }
 
