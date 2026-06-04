@@ -294,7 +294,63 @@
             gap: 8px;
             background: var(--gray-100);
             border-radius: 24px;
-            padding: 8px 8px 8px 16px;
+            padding: 8px;
+        }
+
+        .upload-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: background 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: var(--gray-200);
+        }
+
+        .upload-btn svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gray-600);
+        }
+
+        .file-preview {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 8px 16px 0;
+        }
+
+        .file-tag {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: var(--purple-100);
+            color: var(--purple-500);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 13px;
+        }
+
+        .file-tag .remove-file {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+            border: none;
+            font-size: 10px;
+            line-height: 1;
         }
 
         .input-field {
@@ -556,7 +612,13 @@
 
         <!-- Input Area -->
         <div class="input-area">
+            <div class="file-preview" id="filePreview"></div>
             <div class="input-wrapper">
+                <button class="upload-btn" id="uploadBtn" onclick="document.getElementById('fileInput').click()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                </button>
                 <textarea class="input-field" id="inputField" placeholder="输入消息..." rows="1" onkeydown="handleKeyDown(event)"></textarea>
                 <button class="send-btn" id="sendBtn" onclick="sendMessage()" disabled>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -565,6 +627,7 @@
                     </svg>
                 </button>
             </div>
+            <input type="file" id="fileInput" style="display:none" accept="image/*,.pdf,.doc,.docx,.txt,.js,.py,.json,.md" onchange="handleFileSelect(event)" multiple>
         </div>
 
         <!-- Model Popover -->
@@ -722,6 +785,7 @@
         let conversationId = null;
         let messages = [];
         let isLoading = false;
+        let pendingFiles = [];
 
         // ===== DOM Elements =====
         const messagesContainer = document.getElementById('messagesContainer');
@@ -736,7 +800,7 @@
         inputField.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-            sendBtn.disabled = !this.value.trim();
+            updateSendBtn();
         });
 
         function handleKeyDown(e) {
@@ -825,24 +889,94 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
+        // ===== File Handling =====
+        async function handleFileSelect(event) {
+            var files = event.target.files;
+            if (!files || !files.length) return;
+
+            for (var i = 0; i < files.length; i++) {
+                var f = files[i];
+                // For images, just add them directly
+                if (f.type.startsWith('image/')) {
+                    var reader = new FileReader();
+                    reader.onload = (function(file, name, size) {
+                        return function(e) {
+                            pendingFiles.push({
+                                name: name,
+                                type: 'image',
+                                size: size,
+                                data: e.target.result
+                            });
+                            renderFilePreview();
+                        };
+                    })(f, f.name, f.size);
+                    reader.readAsDataURL(f);
+                } else {
+                    pendingFiles.push({
+                        name: f.name,
+                        type: 'file',
+                        size: f.size,
+                        file: f
+                    });
+                    renderFilePreview();
+                }
+            }
+            event.target.value = '';
+        }
+
+        function renderFilePreview() {
+            var preview = document.getElementById('filePreview');
+            var html = '';
+            for (var i = 0; i < pendingFiles.length; i++) {
+                var f = pendingFiles[i];
+                var icon = f.type === 'image' ? '🖼' : '📎';
+                var label = f.name.length > 15 ? f.name.substr(0, 12) + '...' : f.name;
+                html += '<span class="file-tag">' + icon + ' ' + label + ' <button class="remove-file" onclick="removeFile(' + i + ')">✕</button></span>';
+            }
+            preview.innerHTML = html;
+            updateSendBtn();
+        }
+
+        function removeFile(index) {
+            pendingFiles.splice(index, 1);
+            renderFilePreview();
+        }
+
+        function updateSendBtn() {
+            sendBtn.disabled = !inputField.value.trim() && !pendingFiles.length;
+        }
+
         // ===== Send Message =====
         function sendMessage() {
             const text = inputField.value.trim();
-            if (!text || isLoading) return;
+            const hasFiles = pendingFiles.length > 0;
+            if (!text && !hasFiles) return;
+            if (isLoading) return;
 
             // Hide welcome screen
             if (welcomeScreen) {
                 welcomeScreen.style.display = 'none';
             }
 
+            // Build display text
+            var displayText = text;
+            if (hasFiles) {
+                var labels = pendingFiles.map(function(f) {
+                    return f.type === 'image' ? '[图片]' : '[' + f.name + ']';
+                });
+                displayText = text ? text + ' ' + labels.join(' ') : labels.join(' ');
+            }
+
             // Add user message
-            messages.push({ role: 'user', content: text });
-            messagesContainer.appendChild(createMessageElement('user', text));
+            messages.push({ role: 'user', content: displayText });
+            messagesContainer.appendChild(createMessageElement('user', displayText));
 
             // Clear input
             inputField.value = '';
             inputField.style.height = 'auto';
-            sendBtn.disabled = true;
+            var filesToSend = pendingFiles.slice();
+            pendingFiles = [];
+            renderFilePreview();
 
             // Show typing indicator
             const typingIndicator = createTypingIndicator();
@@ -851,7 +985,7 @@
 
             // Send to API
             isLoading = true;
-            sendToAPI(text);
+            sendToAPI(text, filesToSend);
         }
 
         function sendSuggestion(text) {
@@ -860,11 +994,43 @@
         }
 
         // ===== API Communication =====
-        async function sendToAPI(message) {
+        async function uploadFiles(files) {
+            if (!files || !files.length) return [];
+            var results = [];
+            for (var i = 0; i < files.length; i++) {
+                var f = files[i];
+                var formData = new FormData();
+                if (f.data) {
+                    // Convert base64 data URL to blob
+                    var resp = await fetch(f.data);
+                    var blob = await resp.blob();
+                    formData.append('file', blob, f.name);
+                } else if (f.file) {
+                    formData.append('file', f.file, f.name);
+                } else {
+                    continue;
+                }
+                var uploadResp = await fetch(API_BASE + '/api/upload', {
+                    method: 'POST',
+                    headers: { 'X-User-Id': USER_ID },
+                    body: formData
+                });
+                if (uploadResp.ok) {
+                    var result = await uploadResp.json();
+                    results.push({ name: f.name, type: f.type, size: f.size, path: result.url });
+                }
+            }
+            return results;
+        }
+
+        async function sendToAPI(message, files) {
             assistantMsgEl = null;
             let fullText = '';
             let lastUpdateTime = 0;
             let buffer = '';
+
+            // Upload files first
+            var uploadedFiles = await uploadFiles(files);
 
             try {
                 const response = await fetch(`${API_BASE}/api/chat?stream=1`, {
@@ -877,6 +1043,7 @@
                         conversationId,
                         model: currentModel,
                         message,
+                        files: uploadedFiles
                     }),
                 });
 
