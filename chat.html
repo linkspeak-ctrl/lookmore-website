@@ -1181,7 +1181,6 @@
                         }
                         if (imgUrl) {
                             imageUrl = imgUrl;
-                            fullText += '\n\n![AI生成](' + imgUrl + ')';
                             console.log('[SSE] Image event received:', imgUrl.substring(0, 100));
                         }
                     } else if (eventType === 'done') {
@@ -1251,9 +1250,7 @@
                 // ALL events processed — now render final message
                 console.log('[SSE] Final render: fullText.length=' + (fullText||'').length + ' imageUrl=' + imageUrl + ' doneResult=' + JSON.stringify(doneResult));
                 updateAssistantMessage(fullText || '', true, imageUrl);
-                if (fullText) {
-                    messages.push({ role: 'assistant', content: fullText, imageUrl: imageUrl || null });
-                }
+                messages.push({ role: 'assistant', content: fullText || '', imageUrl: imageUrl || null });
                 if (doneResult && doneResult.conversationId) {
                     conversationId = doneResult.conversationId;
                 }
