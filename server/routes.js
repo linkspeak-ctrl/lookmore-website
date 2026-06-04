@@ -78,8 +78,12 @@ router.post('/chat', async (req, res) => {
           const savedUrl = saveBase64Image(result.imageUrl);
           if (savedUrl) {
             result.imageUrl = `https://api.lookmore.cyou${savedUrl}`;
+            console.log(`[IMAGE] Saved base64 to: ${result.imageUrl}`);
+          } else {
+            console.error('[IMAGE] Failed to save base64 image');
           }
         }
+        console.log(`[IMAGE] Sending image event: ${result.imageUrl.substring(0, 80)}...`);
         res.write(`event: image\ndata: ${JSON.stringify(result.imageUrl)}\n\n`);
       }
 

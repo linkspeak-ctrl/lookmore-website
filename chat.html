@@ -1161,8 +1161,9 @@
                 function doFinish(result) {
                     if (finished) return;
                     finished = true;
+                    // Always update message, even if only image (no text)
+                    updateAssistantMessage(fullText || '', true);
                     if (fullText) {
-                        updateAssistantMessage(fullText, true);
                         messages.push({ role: 'assistant', content: fullText });
                     }
                     if (result && result.conversationId) {
