@@ -824,8 +824,24 @@
                         return '<pre>' + formula + '</pre>';
                     }
                 });
+                // LaTeX block math \[...\]
+                text = text.replace(/\\\[([\s\S]+?)\\\]/g, function(match, formula) {
+                    try {
+                        return '<div class="katex-block">' + katex.renderToString(formula, { displayMode: true, throwOnError: false }) + '</div>';
+                    } catch (e) {
+                        return '<pre>' + formula + '</pre>';
+                    }
+                });
                 // LaTeX inline math $...$
                 text = text.replace(/\$([^\$\n]+?)\$/g, function(match, formula) {
+                    try {
+                        return katex.renderToString(formula, { displayMode: false, throwOnError: false });
+                    } catch (e) {
+                        return '<code>' + formula + '</code>';
+                    }
+                });
+                // LaTeX inline math \(...\)
+                text = text.replace(/\\\((.+?)\\\)/g, function(match, formula) {
                     try {
                         return katex.renderToString(formula, { displayMode: false, throwOnError: false });
                     } catch (e) {
