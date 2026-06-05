@@ -1376,7 +1376,20 @@
 
         // ===== Navigation =====
         function goBack() {
-            window.location.href = 'index.html';
+            // Clear conversation and show welcome screen
+            messages = [];
+            conversationId = null;
+            assistantMsgEl = null;
+            // Remove all message elements except welcome screen
+            var messageList = document.getElementById('messageList');
+            var children = Array.from(messageList.children);
+            children.forEach(function(child) {
+                if (child.id !== 'welcomeScreen') {
+                    messageList.removeChild(child);
+                }
+            });
+            // Show welcome screen
+            document.getElementById('welcomeScreen').style.display = 'flex';
         }
 
         // ===== Init =====
