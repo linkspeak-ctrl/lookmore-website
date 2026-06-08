@@ -1414,19 +1414,19 @@
 
             try {
                 const startTime = Date.now();
-                const response = await fetch(`${API_BASE}/api/models`, {
+                const response = await fetch(`${API_BASE}/api/test`, {
+                    method: 'GET',
                     headers: { 'X-User-Id': USER_ID }
                 });
+                const data = await response.json();
                 const elapsed = Date.now() - startTime;
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const modelCount = data.models ? data.models.length : 0;
-                    updateAssistantMessage(`✅ 连接成功！\n\n- 响应时间：${elapsed}ms\n- 可用模型：${modelCount} 个\n- API 地址：${API_BASE}`, true);
-                    messages.push({ role: 'assistant', content: `✅ 连接成功！响应时间：${elapsed}ms，可用模型：${modelCount} 个` });
+                if (response.ok && data.success) {
+                    updateAssistantMessage(`✅ 连接成功！\n\n- 响应时间：${data.responseTime}ms\n- 模型：${data.model}\n- API 地址：${API_BASE}\n- 本地延迟：${elapsed}ms`, true);
+                    messages.push({ role: 'assistant', content: `✅ 连接成功！响应时间：${data.responseTime}ms，模型：${data.model}` });
                 } else {
-                    updateAssistantMessage(`❌ 连接失败：HTTP ${response.status}`, true);
-                    messages.push({ role: 'assistant', content: `❌ 连接失败：HTTP ${response.status}` });
+                    updateAssistantMessage(`❌ 连接失败：${data.error || '未知错误'}`, true);
+                    messages.push({ role: 'assistant', content: `❌ 连接失败：${data.error || '未知错误'}` });
                 }
             } catch (error) {
                 updateAssistantMessage(`❌ 连接失败：${error.message}`, true);

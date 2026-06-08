@@ -7,6 +7,29 @@ const store = require('./store');
 
 const router = Router();
 
+// API Connection Test
+router.get('/test', async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const result = await lazymanchat.directChatCompletion(
+      'gpt-5.5',
+      [{ role: 'user', content: 'Hi' }]
+    );
+    const elapsed = Date.now() - startTime;
+    res.json({
+      success: true,
+      responseTime: elapsed,
+      message: result ? '连接成功' : '连接失败',
+      model: 'gpt-5.5'
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
+
 const uploadDir = path.join(__dirname, 'public', 'uploads');
 fs.mkdirSync(uploadDir, { recursive: true });
 const upload = multer({
