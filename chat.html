@@ -1397,45 +1397,105 @@
             document.getElementById('welcomeScreen').style.display = 'flex';
         }
 
+        // ===== ChatGPT Web Session =====
+        let chatgptSessionId = null;
+
         // ===== API Connection Test =====
         async function testApiConnection() {
             closeModelPopover();
-            // Hide welcome screen
-            if (welcomeScreen) {
-                welcomeScreen.style.display = 'none';
-            }
-            // Add test message
-            messages.push({ role: 'user', content: '测试连接' });
-            messageList.appendChild(createMessageElement('user', '测试连接'));
-            // Show typing indicator
-            const typingIndicator = createTypingIndicator();
-            messageList.appendChild(typingIndicator);
-            scrollToBottom();
 
-            try {
-                const startTime = Date.now();
-                const response = await fetch(`${API_BASE}/api/test`, {
-                    method: 'GET',
-                    headers: { 'X-User-Id': USER_ID }
-                });
-                const data = await response.json();
-                const elapsed = Date.now() - startTime;
+            // 检查是否已登录 ChatGPT
+            if (chatgptSessionId) {
+                // 已登录，发送消息
+                const message = prompt('输入要发送给 ChatGPT 的消息：');
+                if (!message) return;
 
-                if (response.ok && data.success) {
-                    updateAssistantMessage(`✅ 连接成功！\n\n- 响应时间：${data.responseTime}ms\n- 模型：${data.model}\n- API 地址：${API_BASE}\n- 本地延迟：${elapsed}ms`, true);
-                    messages.push({ role: 'assistant', content: `✅ 连接成功！响应时间：${data.responseTime}ms，模型：${data.model}` });
-                } else {
-                    updateAssistantMessage(`❌ 连接失败：${data.error || '未知错误'}`, true);
-                    messages.push({ role: 'assistant', content: `❌ 连接失败：${data.error || '未知错误'}` });
+                // Hide welcome screen
+                if (welcomeScreen) {
+                    welcomeScreen.style.display = 'none';
                 }
-            } catch (error) {
-                updateAssistantMessage(`❌ 连接失败：${error.message}`, true);
-                messages.push({ role: 'assistant', content: `❌ 连接失败：${error.message}` });
-            }
+                // Add test message
+                messages.push({ role: 'user', content: message });
+                messageList.appendChild(createMessageElement('user', message));
+                // Show typing indicator
+                const typingIndicator = createTypingIndicator();
+                messageList.appendChild(typingIndicator);
+                scrollToBottom();
 
-            const typingEl = document.getElementById('typingIndicator');
-            if (typingEl) typingEl.remove();
-            scrollToBottom();
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE}/api/chatgpt/chat`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ sessionId: chatgptSessionId, message })
+                    });
+                    const data = await response.json();
+                    const elapsed = Date.now() - startTime;
+
+                    if (response.ok && data.success) {
+                        updateAssistantMessage(`✅ ChatGPT 回复：\n\n${data.message}\n\n- 响应时间：${elapsed}ms`, true);
+                        messages.push({ role: 'assistant', content: `✅ ChatGPT 回复：${data.message}` });
+                    } else {
+                        updateAssistantMessage(`❌ 发送失败：${data.error || '未知错误'}`, true);
+                        messages.push({ role: 'assistant', content: `❌ 发送失败：${data.error || '未知错误'}` });
+                        if (data.error === '会话已过期，请重新登录') {
+                            chatgptSessionId = null;
+                        }
+                    }
+                } catch (error) {
+                    updateAssistantMessage(`❌ 发送失败：${error.message}`, true);
+                    messages.push({ role: 'assistant', content: `❌ 发送失败：${error.message}` });
+                }
+
+                const typingEl = document.getElementById('typingIndicator');
+                if (typingEl) typingEl.remove();
+                scrollToBottom();
+            } else {
+                // 未登录，显示登录对话框
+                const email = prompt('请输入 ChatGPT 邮箱：');
+                if (!email) return;
+                const password = prompt('请输入 ChatGPT 密码：');
+                if (!password) return;
+
+                // Hide welcome screen
+                if (welcomeScreen) {
+                    welcomeScreen.style.display = 'none';
+                }
+                // Add test message
+                messages.push({ role: 'user', content: '登录 ChatGPT' });
+                messageList.appendChild(createMessageElement('user', '登录 ChatGPT'));
+                // Show typing indicator
+                const typingIndicator = createTypingIndicator();
+                messageList.appendChild(typingIndicator);
+                scrollToBottom();
+
+                try {
+                    const startTime = Date.now();
+                    const response = await fetch(`${API_BASE}/api/chatgpt/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const data = await response.json();
+                    const elapsed = Date.now() - startTime;
+
+                    if (response.ok && data.success) {
+                        chatgptSessionId = data.sessionId;
+                        updateAssistantMessage(`✅ ChatGPT 登录成功！\n\n- 响应时间：${elapsed}ms\n- 会话ID：${chatgptSessionId}\n\n现在可以发送消息了。`, true);
+                        messages.push({ role: 'assistant', content: `✅ ChatGPT 登录成功！响应时间：${elapsed}ms` });
+                    } else {
+                        updateAssistantMessage(`❌ 登录失败：${data.error || '未知错误'}`, true);
+                        messages.push({ role: 'assistant', content: `❌ 登录失败：${data.error || '未知错误'}` });
+                    }
+                } catch (error) {
+                    updateAssistantMessage(`❌ 登录失败：${error.message}`, true);
+                    messages.push({ role: 'assistant', content: `❌ 登录失败：${error.message}` });
+                }
+
+                const typingEl = document.getElementById('typingIndicator');
+                if (typingEl) typingEl.remove();
+                scrollToBottom();
+            }
         }
 
         // ===== Init =====
