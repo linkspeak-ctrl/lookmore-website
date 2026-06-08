@@ -798,6 +798,11 @@
                 <span class="model-option-name">Claude-Opus-4.7（10次/3h）</span>
                 <svg class="model-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
+            <div class="model-category">接口测试</div>
+            <div class="model-option" onclick="testApiConnection()">
+                <span class="model-option-name">测试连接</span>
+                <svg class="model-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
         </div>
     </div>
 
@@ -1390,6 +1395,47 @@
             });
             // Show welcome screen
             document.getElementById('welcomeScreen').style.display = 'flex';
+        }
+
+        // ===== API Connection Test =====
+        async function testApiConnection() {
+            closeModelPopover();
+            // Hide welcome screen
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
+            // Add test message
+            messages.push({ role: 'user', content: '测试连接' });
+            messageList.appendChild(createMessageElement('user', '测试连接'));
+            // Show typing indicator
+            const typingIndicator = createTypingIndicator();
+            messageList.appendChild(typingIndicator);
+            scrollToBottom();
+
+            try {
+                const startTime = Date.now();
+                const response = await fetch(`${API_BASE}/api/models`, {
+                    headers: { 'X-User-Id': USER_ID }
+                });
+                const elapsed = Date.now() - startTime;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const modelCount = data.models ? data.models.length : 0;
+                    updateAssistantMessage(`✅ 连接成功！\n\n- 响应时间：${elapsed}ms\n- 可用模型：${modelCount} 个\n- API 地址：${API_BASE}`, true);
+                    messages.push({ role: 'assistant', content: `✅ 连接成功！响应时间：${elapsed}ms，可用模型：${modelCount} 个` });
+                } else {
+                    updateAssistantMessage(`❌ 连接失败：HTTP ${response.status}`, true);
+                    messages.push({ role: 'assistant', content: `❌ 连接失败：HTTP ${response.status}` });
+                }
+            } catch (error) {
+                updateAssistantMessage(`❌ 连接失败：${error.message}`, true);
+                messages.push({ role: 'assistant', content: `❌ 连接失败：${error.message}` });
+            }
+
+            const typingEl = document.getElementById('typingIndicator');
+            if (typingEl) typingEl.remove();
+            scrollToBottom();
         }
 
         // ===== Init =====
