@@ -14,9 +14,8 @@ const config = {
     model: process.env.AI_MODEL || 'gpt-5.5',
   },
   chatgpt: {
-    apiKey: process.env.CHATGPT_API_KEY || '',
-    baseUrl: process.env.CHATGPT_BASE_URL || 'https://api.openai.com/v1',
-    model: process.env.CHATGPT_MODEL || 'gpt-4',
+    email: process.env.CHATGPT_EMAIL || '',
+    password: process.env.CHATGPT_PASSWORD || '',
   },
   dataDir: path.resolve(__dirname, process.env.DATA_DIR || './data'),
 };
