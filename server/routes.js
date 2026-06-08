@@ -4,24 +4,51 @@ const fs = require('fs');
 const multer = require('multer');
 const lazymanchat = require('./lazymanchat');
 const store = require('./store');
+const config = require('./config');
 
 const router = Router();
 
-// API Connection Test
+// ChatGPT API Connection Test
 router.get('/test', async (req, res) => {
   try {
+    if (!config.chatgpt.apiKey) {
+      return res.status(400).json({
+        success: false,
+        error: 'ChatGPT API Key 未配置，请在服务器环境变量中设置 CHATGPT_API_KEY'
+      });
+    }
+
     const startTime = Date.now();
-    const result = await lazymanchat.directChatCompletion(
-      'gpt-5.5',
-      [{ role: 'user', content: 'Hi' }]
-    );
-    const elapsed = Date.now() - startTime;
-    res.json({
-      success: true,
-      responseTime: elapsed,
-      message: result ? '连接成功' : '连接失败',
-      model: 'gpt-5.5'
+    const response = await fetch(`${config.chatgpt.baseUrl}/chat/completions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${config.chatgpt.apiKey}`
+      },
+      body: JSON.stringify({
+        model: config.chatgpt.model,
+        messages: [{ role: 'user', content: 'Hi' }],
+        max_tokens: 10
+      })
     });
+
+    const data = await response.json();
+    const elapsed = Date.now() - startTime;
+
+    if (response.ok) {
+      res.json({
+        success: true,
+        responseTime: elapsed,
+        message: data.choices[0].message.content,
+        model: config.chatgpt.model
+      });
+    } else {
+      res.status(500).json({
+        success: false,
+        error: data.error?.message || 'ChatGPT API 调用失败',
+        responseTime: elapsed
+      });
+    }
   } catch (err) {
     res.status(500).json({
       success: false,
